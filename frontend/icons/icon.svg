@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="64" fill="#001F89"/>
+  <rect y="440" width="512" height="72" rx="0" fill="#B71373"/>
+  <text x="256" y="280" font-family="Oswald, Arial, sans-serif" font-size="180" font-weight="700" fill="white" text-anchor="middle" dominant-baseline="central">MEL</text>
+  <text x="256" y="400" font-family="Oswald, Arial, sans-serif" font-size="72" font-weight="400" fill="rgba(255,255,255,0.7)" text-anchor="middle" dominant-baseline="central">PARES</text>
+</svg>

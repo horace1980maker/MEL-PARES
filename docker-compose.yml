@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  mel-pares:
+    build: .
+    container_name: mel-pares-dashboard
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - mel_pares_data:/data
+    environment:
+      - DATABASE_URL=sqlite:////data/mel_pares.db
+
+volumes:
+  mel_pares_data:

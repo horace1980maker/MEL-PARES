@@ -1,0 +1,37 @@
+{
+  "brand": "EU-UNEP Partnership",
+  "global_colors": {
+    "neutral_base": "#001F89",
+    "primary_accent": "#009EE2"
+  },
+  "latin_america_colors": {
+    "primary": "#B71373",
+    "secondary": "#751851"
+  },
+  "logo_rules": {
+    "clear_space_ratio": "1/6 height",
+    "min_size_horizontal_mm": 22,
+    "min_size_vertical_mm": 24,
+    "min_margin_mm": 10,
+    "banner_bottom_margin_mm": 5,
+    "always_include_partner_logos": true
+  },
+  "typography": {
+    "title_font": "Oswald",
+    "body_font": "Noto Sans",
+    "title_case": "ALL CAPS",
+    "body_weights": ["Regular", "Light"],
+    "emphasis_weight": "SemiBold"
+  },
+  "maps": {
+    "projection": "Robinson",
+    "require_scale": true,
+    "require_north_arrow": true,
+    "double_stroke_borders": true
+  },
+  "illustration_style": {
+    "flat": true,
+    "max_colors": 4,
+    "no_faces": true
+  }
+}

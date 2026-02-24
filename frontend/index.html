@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="Dashboard MEL del Proyecto PARES - Monitoreo, Evaluación y Aprendizaje" />
+    <meta name="theme-color" content="#001F89" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="MEL-PARES" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="icons/icon-192.png" />
+    <title>MEL-PARES Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Noto+Sans:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <!-- Mobile hamburger -->
+    <button id="menu-toggle" class="menu-toggle" aria-label="Menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <nav id="sidebar" class="sidebar" role="navigation" aria-label="Navegación principal">
+      <div class="sidebar-header">
+        <div class="brand-mark">MEL</div>
+        <div class="brand-name">PARES</div>
+      </div>
+      <ul class="nav-links">
+        <li>
+          <a href="#inicio" class="nav-link active" data-module="inicio">
+            <span class="nav-icon">🏠</span
+            ><span class="nav-label">Inicio</span></a
+          >
+        </li>
+        <li>
+          <a href="#indicadores" class="nav-link" data-module="indicadores">
+            <span class="nav-icon">📊</span
+            ><span class="nav-label">Indicadores</span></a
+          >
+        </li>
+        <li>
+          <a href="#ruta" class="nav-link" data-module="ruta">
+            <span class="nav-icon">🗓️</span
+            ><span class="nav-label">Ruta del Proyecto</span></a
+          >
+        </li>
+        <li>
+          <a href="#comparador" class="nav-link" data-module="comparador">
+            <span class="nav-icon">📈</span
+            ><span class="nav-label">Comparador</span></a
+          >
+        </li>
+        <li>
+          <a href="#aprendizaje" class="nav-link" data-module="aprendizaje">
+            <span class="nav-icon">💡</span
+            ><span class="nav-label">Aprendizaje</span></a
+          >
+        </li>
+        <li>
+          <a href="#inclusion" class="nav-link" data-module="inclusion">
+            <span class="nav-icon">🤝</span
+            ><span class="nav-label">Inclusión</span></a
+          >
+        </li>
+        <li>
+          <a href="#territorio" class="nav-link" data-module="territorio">
+            <span class="nav-icon">🗺️</span
+            ><span class="nav-label">Territorio</span></a
+          >
+        </li>
+        <li>
+          <a href="#evidencia" class="nav-link" data-module="evidencia">
+            <span class="nav-icon">📁</span
+            ><span class="nav-label">Evidencia</span></a
+          >
+        </li>
+      </ul>
+
+    </nav>
+
+    <!-- Main content -->
+    <main id="main-content" class="main-content">
+      <!-- Top bar with global filters -->
+      <header class="top-bar">
+        <h1 id="page-title" class="page-title">INICIO</h1>
+        <div class="global-filters">
+          <select
+            id="filter-corte"
+            class="filter-select"
+            title="Corte de reporte"
+          >
+            <option value="">Todo el período</option>
+          </select>
+          <select id="filter-paisaje" class="filter-select" title="Paisaje">
+            <option value="">Todos los paisajes</option>
+          </select>
+          <select
+            id="filter-organizacion"
+            class="filter-select"
+            title="Organización"
+          >
+            <option value="">Todas las organizaciones</option>
+          </select>
+        </div>
+      </header>
+
+      <!-- Dynamic content area -->
+      <div id="content-area" class="content-area">
+        <div class="loading-spinner">Cargando...</div>
+      </div>
+
+      <!-- Partner logos bar -->
+      <footer class="logo-bar">
+        <img src="logos/eu-unep-partnership.png" alt="EU-UNEP Partnership" class="logo-bar-img">
+        <img src="logos/un-environment.png" alt="UN Environment Programme" class="logo-bar-img">
+        <img src="logos/eu-funded.png" alt="Funded by the European Union" class="logo-bar-img">
+        <img src="logos/catie.png" alt="CATIE" class="logo-bar-img">
+      </footer>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script src="modules/inicio.js"></script>
+    <script src="modules/indicadores.js"></script>
+    <script src="modules/ruta.js"></script>
+    <script src="modules/comparador.js"></script>
+    <script src="modules/aprendizaje.js"></script>
+    <script src="modules/inclusion.js"></script>
+    <script src="modules/territorio.js"></script>
+    <script src="modules/evidencia.js"></script>
+    <script>
+      // Service Worker registration
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      }
+      // Mobile menu toggle
+      const menuBtn = document.getElementById('menu-toggle');
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      function toggleMenu() {
+        const open = sidebar.classList.toggle('open');
+        overlay.classList.toggle('open', open);
+        menuBtn.classList.toggle('open', open);
+        menuBtn.setAttribute('aria-expanded', open);
+      }
+      menuBtn.addEventListener('click', toggleMenu);
+      overlay.addEventListener('click', toggleMenu);
+      sidebar.querySelectorAll('.nav-link').forEach(l => l.addEventListener('click', () => {
+        if (window.innerWidth <= 900) toggleMenu();
+      }));
+    </script>
+  </body>
+</html>

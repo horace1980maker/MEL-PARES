@@ -1,0 +1,25 @@
+{
+    "name": "MEL-PARES Dashboard",
+    "short_name": "MEL-PARES",
+    "description": "Dashboard MEL del Proyecto PARES — Monitoreo, Evaluación y Aprendizaje",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#f8f9fc",
+    "theme_color": "#001F89",
+    "orientation": "any",
+    "lang": "es",
+    "icons": [
+        {
+            "src": "icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
