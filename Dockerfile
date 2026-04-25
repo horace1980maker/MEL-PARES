@@ -14,6 +14,9 @@ RUN pip install --no-cache-dir -r backend/requirements.txt
 COPY backend/ ./backend/
 COPY frontend/ ./frontend/
 
+# Copy the xlsx data file into the image
+COPY 20260424_Monitoreo-Cumplimiento-Proyectos-PARES.xlsx /app/data.xlsx
+
 # Expose the port the app runs on
 EXPOSE 8000
 
@@ -23,5 +26,8 @@ ENV DATABASE_URL="sqlite:////data/mel_pares.db"
 # Change working directory to backend to run uvicorn
 WORKDIR /app/backend
 
-# Command to run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Make start script executable
+RUN chmod +x start.sh
+
+# Use startup script (auto-imports data if DB is empty)
+CMD ["bash", "start.sh"]
