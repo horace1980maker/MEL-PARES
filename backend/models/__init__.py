@@ -5,10 +5,11 @@ from .medicion import Medicion
 from .evidencia import Evidencia, EvidenciaIndicador, EvidenciaLQ, EvidenciaHito
 from .changelog import ChangelogMedicion
 from .corte import Corte, CorteDetalle
+from .mel_socios import MelSocioIndicador
 
 __all__ = [
     "Organizacion", "Paisaje", "Comunidad", "Piloto",
     "Indicador", "PreguntaDeAprendizaje", "Instrumento", "Hito",
     "Medicion", "Evidencia", "EvidenciaIndicador", "EvidenciaLQ", "EvidenciaHito",
-    "ChangelogMedicion", "Corte", "CorteDetalle",
+    "ChangelogMedicion", "Corte", "CorteDetalle", "MelSocioIndicador",
 ]

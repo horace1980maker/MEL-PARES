@@ -34,6 +34,22 @@ const api = {
         return res.json();
     },
 
+    async patchAuth(endpoint, data, token) {
+        const res = await fetch(`${API_BASE}${endpoint}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify(data),
+        });
+        if (!res.ok) {
+            const detail = await res.json().catch(() => ({}));
+            throw new Error(detail.detail || `API error: ${res.status}`);
+        }
+        return res.json();
+    },
+
     // Shortcuts
     indicadores: (params) => api.get(`${API_BASE}/indicadores`, params),
     preguntas: () => api.get(`${API_BASE}/preguntas`),
@@ -48,4 +64,9 @@ const api = {
     resumen: () => api.get(`${API_BASE}/agregacion/resumen`),
     cortes: () => api.get(`${API_BASE}/cortes`),
     quickUpdate: (data) => api.patch('/mediciones/quick-update', data),
+    melSocios: (params) => api.get(`${API_BASE}/mel-socios`, params),
+    melSociosResumen: (params) => api.get(`${API_BASE}/mel-socios/resumen`, params),
+    melSociosOrganizaciones: () => api.get(`${API_BASE}/mel-socios/organizaciones`),
+    melSociosLogin: (data) => api.post('/mel-socios/login', data),
+    melSociosUpdate: (id, data, token) => api.patchAuth(`/mel-socios/${id}`, data, token),
 };

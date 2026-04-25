@@ -50,6 +50,12 @@
           >
         </li>
         <li>
+          <a href="#melSocios" class="nav-link" data-module="melSocios">
+            <span class="nav-icon">M</span
+            ><span class="nav-label">MEL socios</span></a
+          >
+        </li>
+        <li>
           <a href="#ruta" class="nav-link" data-module="ruta">
             <span class="nav-icon">🗓️</span
             ><span class="nav-label">Ruta del Proyecto</span></a
@@ -91,28 +97,9 @@
 
     <!-- Main content -->
     <main id="main-content" class="main-content">
-      <!-- Top bar with global filters -->
+      <!-- Top bar -->
       <header class="top-bar">
         <h1 id="page-title" class="page-title">INICIO</h1>
-        <div class="global-filters">
-          <select
-            id="filter-corte"
-            class="filter-select"
-            title="Corte de reporte"
-          >
-            <option value="">Todo el período</option>
-          </select>
-          <select id="filter-paisaje" class="filter-select" title="Paisaje">
-            <option value="">Todos los paisajes</option>
-          </select>
-          <select
-            id="filter-organizacion"
-            class="filter-select"
-            title="Organización"
-          >
-            <option value="">Todas las organizaciones</option>
-          </select>
-        </div>
       </header>
 
       <!-- Dynamic content area -->
@@ -135,6 +122,7 @@
     <script src="js/app.js"></script>
     <script src="modules/inicio.js"></script>
     <script src="modules/indicadores.js"></script>
+    <script src="modules/mel-socios.js"></script>
     <script src="modules/ruta.js"></script>
     <script src="modules/comparador.js"></script>
     <script src="modules/aprendizaje.js"></script>
@@ -142,9 +130,15 @@
     <script src="modules/territorio.js"></script>
     <script src="modules/evidencia.js"></script>
     <script>
-      // Service Worker registration
+      // Disable the PWA service worker during active dashboard iteration.
+      // The previous cache-first worker can keep serving stale JS/CSS even after hard refresh.
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js').catch(() => {});
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+          registrations.forEach(registration => registration.unregister());
+        }).catch(() => {});
+      }
+      if ('caches' in window) {
+        caches.keys().then(keys => keys.forEach(key => caches.delete(key))).catch(() => {});
       }
       // Mobile menu toggle
       const menuBtn = document.getElementById('menu-toggle');

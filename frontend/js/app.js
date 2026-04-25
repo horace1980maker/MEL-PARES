@@ -4,7 +4,6 @@
 const modules = {};
 const state = {
     currentModule: 'inicio',
-    filters: { corte: '', paisaje: '', organizacion: '' },
 };
 
 /** Registrar un módulo */
@@ -14,7 +13,13 @@ function registerModule(name, renderFn) {
 
 /** Navegación por hash */
 function navigate(hash) {
-    const module = hash.replace('#', '') || 'inicio';
+    const routeAliases = {
+        'mel-socios': 'melSocios',
+        'mel_socios': 'melSocios',
+        melsocios: 'melSocios',
+    };
+    const requestedModule = hash.replace('#', '') || 'inicio';
+    const module = routeAliases[requestedModule] || requestedModule;
     state.currentModule = module;
 
     // Actualizar sidebar
@@ -26,6 +31,7 @@ function navigate(hash) {
     const titles = {
         inicio: 'Inicio',
         indicadores: 'Indicadores',
+        melSocios: 'MEL socios',
         ruta: 'Ruta del Proyecto',
         comparador: 'Comparador de Cambio',
         aprendizaje: 'Aprendizaje',
@@ -40,7 +46,7 @@ function navigate(hash) {
     area.innerHTML = '<div class="loading-spinner">Cargando...</div>';
 
     if (modules[module]) {
-        modules[module](area, state.filters);
+        modules[module](area, {});
     } else {
         area.innerHTML = `<div class="empty-state">
             <div class="empty-state-icon">🚧</div>
@@ -49,58 +55,8 @@ function navigate(hash) {
     }
 }
 
-/** Cargar opciones de filtros globales */
-async function loadFilters() {
-    try {
-        const [paisajes, orgs, cortes] = await Promise.all([
-            api.paisajes(),
-            api.organizaciones(),
-            api.cortes(),
-        ]);
-
-        const fpaisaje = document.getElementById('filter-paisaje');
-        paisajes.forEach(p => {
-            const opt = document.createElement('option');
-            opt.value = p.id;
-            opt.textContent = p.nombre;
-            fpaisaje.appendChild(opt);
-        });
-
-        const forg = document.getElementById('filter-organizacion');
-        orgs.forEach(o => {
-            const opt = document.createElement('option');
-            opt.value = o.id;
-            opt.textContent = o.nombre;
-            forg.appendChild(opt);
-        });
-
-        const fcorte = document.getElementById('filter-corte');
-        cortes.forEach(c => {
-            const opt = document.createElement('option');
-            opt.value = c.id;
-            opt.textContent = `${c.nombre} (${c.fecha})`;
-            fcorte.appendChild(opt);
-        });
-    } catch (e) {
-        console.warn('No se pudieron cargar filtros:', e);
-    }
-}
-
 /** Inicialización */
 document.addEventListener('DOMContentLoaded', () => {
-    loadFilters();
-
-    // Listeners de filtros
-    ['filter-corte', 'filter-paisaje', 'filter-organizacion'].forEach(id => {
-        const el = document.getElementById(id);
-        el.addEventListener('change', () => {
-            state.filters.corte = document.getElementById('filter-corte').value;
-            state.filters.paisaje = document.getElementById('filter-paisaje').value;
-            state.filters.organizacion = document.getElementById('filter-organizacion').value;
-            navigate(window.location.hash || '#inicio');
-        });
-    });
-
     // Hash routing
     window.addEventListener('hashchange', () => navigate(window.location.hash));
     navigate(window.location.hash || '#inicio');
