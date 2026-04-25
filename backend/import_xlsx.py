@@ -56,6 +56,7 @@ from models.mel import Indicador, PreguntaDeAprendizaje, Instrumento, Hito
 from models.medicion import Medicion
 from models.evidencia import Evidencia, EvidenciaIndicador, EvidenciaLQ
 from models.changelog import ChangelogMedicion
+from models.mel_socios import MelSocioIndicador
 
 # Monitoring period dates
 MONITOREO_DATES = {
@@ -130,7 +131,7 @@ def import_xlsx(xlsx_path):
             db.flush()
 
         # ── Track stats ──
-        stats = {"orgs": 0, "indicadores": 0, "mediciones": 0, "skipped": 0}
+        stats = {"orgs": 0, "indicadores": 0, "mediciones": 0, "mel_socios": 0, "skipped": 0}
         indicator_counter = 0
 
         # ── Process each sheet (= one organization) ──
@@ -231,12 +232,45 @@ def import_xlsx(xlsx_path):
                         ))
                         stats["mediciones"] += 1
 
+                # ── Also populate mel_socios_indicadores table ──
+                total_acum = sum(v for v in [m1, m2, m3, m4] if v is not None)
+                pct_avance = (total_acum / meta) if meta and meta > 0 else 0.0
+                source_id = f"{sheet_name}_{row_num}"
+
+                mel_row = MelSocioIndicador(
+                    source_id=source_id,
+                    organizacion=org_name,
+                    sheet=sheet_name,
+                    excel_row=row_num,
+                    tipo=current_tipo,
+                    descripcion_esperada=descripcion,
+                    indicador=indicador_texto,
+                    linea_base=linea_base_text if linea_base_text else None,
+                    monitoreo_1=safe_str(ws.cell(row_num, 4).value) or None,
+                    monitoreo_2=safe_str(ws.cell(row_num, 5).value) or None,
+                    monitoreo_3=safe_str(ws.cell(row_num, 6).value) or None,
+                    monitoreo_4=safe_str(ws.cell(row_num, 7).value) or None,
+                    total_acumulado=total_acum,
+                    meta_numerica=meta,
+                    porcentaje_avance=pct_avance,
+                    meta_descriptiva=meta_desc or None,
+                    observacion_1=obs1 or None,
+                    observacion_2=obs2 or None,
+                    observacion_3=obs3 or None,
+                    observacion_4=obs4 or None,
+                    estado_validacion="importado",
+                    updated_by="import:xlsx",
+                )
+                db.add(mel_row)
+                stats["mel_socios"] += 1
+
         db.commit()
         print(f"\n{'='*60}")
         print(f"[OK] Import complete!")
         print(f"   Organizations: {stats['orgs']}")
         print(f"   Indicators:    {stats['indicadores']}")
         print(f"   Measurements:  {stats['mediciones']}")
+        print(f"   MEL socios:    {stats['mel_socios']}")
         print(f"{'='*60}")
         print(f"\nTo run the dashboard: uvicorn main:app --host 0.0.0.0 --port 8000")
 
