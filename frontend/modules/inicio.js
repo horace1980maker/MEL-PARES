@@ -7,6 +7,7 @@ registerModule('inicio', async (container, filters) => {
 
         container.innerHTML = `
         <div class="intro-hero">
+            <div class="intro-icon">🌱</div>
             <h2 class="intro-title">Sistema de Monitoreo, Evaluación y Aprendizaje</h2>
             <p class="intro-subtitle">Proyecto PARES</p>
         </div>
@@ -18,6 +19,7 @@ registerModule('inicio', async (container, filters) => {
 
         <div class="intro-pillars">
             <div class="card intro-pillar">
+                <div class="pillar-icon">🎯</div>
                 <h3 class="pillar-title">Lógica de Intervención</h3>
                 <div class="pillar-body">
                     <div class="pillar-item">
@@ -51,12 +53,8 @@ registerModule('inicio', async (container, filters) => {
                 <div class="intro-stat-label">Hitos Completados</div>
             </div>
         </div>
-
-        <div style="text-align:center;margin-top:1.5rem">
-            <a href="#indicadores" class="intro-cta">Ver Indicadores</a>
-        </div>
         `;
     } catch (e) {
-        container.innerHTML = `<div class="empty-state"><div class="empty-state-text">Error al cargar datos: ${e.message}</div></div>`;
+        container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">Error al cargar datos: ${e.message}</div></div>`;
     }
 });
