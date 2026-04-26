@@ -23,7 +23,9 @@ registerModule('melSocios', async (container) => {
     try {
         const organizaciones = await api.melSociosOrganizaciones();
         const localOrg = sessionStorage.getItem('melSociosOrg') || '';
-        const selectedOrg = localOrg || 'Todas';
+        // Auto-filter to logged-in org (unless admin or manually changed)
+        const autoOrg = auth && auth.organizacion !== 'Todas' ? auth.organizacion : '';
+        const selectedOrg = localOrg || autoOrg || 'Todas';
 
         const params = {};
         const queryOrg = selectedOrg;
@@ -55,8 +57,8 @@ registerModule('melSocios', async (container) => {
         container.innerHTML = `
             <div class="mel-socios-toolbar card">
                 <div>
-                    <div class="card-title">MEL socios</div>
-                    <p class="module-subtitle">Matriz de indicadores por organizacion, importada desde el Excel de monitoreo y conectada a la base de datos.</p>
+                    <div class="card-title">Matriz de indicadores general y por organizacion</div>
+                    <p class="module-subtitle">Visualización general y detallada de los indicadores del proyecto por organización.</p>
                 </div>
                 <div class="mel-socios-actions">
                     <select id="mel-org-filter" class="filter-select" title="Organizacion">${orgOptions}</select>
@@ -66,7 +68,10 @@ registerModule('melSocios', async (container) => {
                         <option value="output">Outputs</option>
                     </select>
                     <input id="mel-search" class="filter-input" type="search" placeholder="Buscar indicador" />
-                    <button id="mel-login-toggle" class="btn-light">${auth ? esc(auth.username) : 'Ingreso socios'}</button>
+                    ${auth
+                        ? `<span class="mel-auth-info"><span class="mel-auth-user">${esc(auth.username)}</span><button id="mel-logout" class="btn-danger-sm" title="Cerrar sesion">Cerrar sesion</button></span>`
+                        : `<button id="mel-login-toggle" class="btn-light">Ingreso socios</button>`
+                    }
                 </div>
             </div>
 
@@ -82,7 +87,7 @@ registerModule('melSocios', async (container) => {
             <div class="mel-socios-grid">
                 <section class="card">
                     <div class="card-header"><h2 class="card-title">Resumen</h2></div>
-                    <div id="mel-org-summary" class="mel-org-summary"></div>
+                    <div id="mel-org-summary" class="mel-org-summary" style="max-height:260px;overflow-y:auto"></div>
                 </section>
                 <section class="card">
                     <div class="card-header"><h2 class="card-title">Balance outcomes / outputs</h2></div>
@@ -191,10 +196,14 @@ registerModule('melSocios', async (container) => {
                         <label>Linea base<input ${disabled} data-field="linea_base" value="${esc(row.linea_base) === '-' ? '' : esc(row.linea_base)}"></label>
                         <label>Meta numerica<input ${disabled} data-field="meta_numerica" type="number" step="any" value="${esc(row.meta_numerica) === '-' ? '' : esc(row.meta_numerica)}"></label>
                         <label class="span-2">Meta descriptiva<textarea ${disabled} data-field="meta_descriptiva">${esc(row.meta_descriptiva) === '-' ? '' : esc(row.meta_descriptiva)}</textarea></label>
+                    </div>
+                    <div class="mel-monitoring-grid">
                         ${[1,2,3,4].map(i => `
                             <label>Monitoreo ${i}<input ${disabled} data-field="monitoreo_${i}" value="${esc(row.monitoring[i - 1]) === '-' ? '' : esc(row.monitoring[i - 1])}"></label>
                             <label>Observacion ${i}<textarea ${disabled} data-field="observacion_${i}">${esc(row.notes[i - 1]) === '-' ? '' : esc(row.notes[i - 1])}</textarea></label>
                         `).join('')}
+                    </div>
+                    <div class="mel-edit-fields">
                         <label>Responsable<input ${disabled} data-field="responsable" value="${esc(row.responsable) === '-' ? '' : esc(row.responsable)}"></label>
                         <label>URL evidencia<input ${disabled} data-field="evidencia_url" value="${esc(row.evidencia_url) === '-' ? '' : esc(row.evidencia_url)}"></label>
                     </div>
@@ -241,12 +250,14 @@ registerModule('melSocios', async (container) => {
 
         container.querySelector('#mel-type-filter').addEventListener('change', () => renderRows(currentList()));
         container.querySelector('#mel-search').addEventListener('input', () => renderRows(currentList()));
-        container.querySelector('#mel-login-toggle').addEventListener('click', () => {
-            if (auth) {
+        if (auth) {
+            container.querySelector('#mel-logout').addEventListener('click', () => {
                 localStorage.removeItem(authKey);
+                sessionStorage.removeItem('melSociosOrg');
                 navigate('#melSocios');
-                return;
-            }
+            });
+        } else {
+        container.querySelector('#mel-login-toggle').addEventListener('click', () => {
             container.querySelector('#mel-login-panel').innerHTML = `
                 <form id="mel-login-form" class="mel-login">
                     <label>Usuario<input name="username" autocomplete="username" required placeholder="admin, adel, puca..."></label>
@@ -270,6 +281,7 @@ registerModule('melSocios', async (container) => {
                 }
             });
         });
+        }
 
         renderSummary(records);
         renderRows(records);

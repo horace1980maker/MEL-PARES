@@ -1005,6 +1005,65 @@ body {
   max-height: 100px;
   resize: vertical;
 }
+.mel-monitoring-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+  margin: 0.5rem 0;
+}
+.mel-monitoring-grid label {
+  display: grid;
+  gap: 0.3rem;
+  color: var(--text-light);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.mel-monitoring-grid textarea {
+  min-height: 52px;
+  max-height: 100px;
+  resize: vertical;
+}
+.mel-monitoring-grid input,
+.mel-monitoring-grid textarea {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.7rem;
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--text);
+  transition: border var(--transition);
+}
+.mel-monitoring-grid input:focus,
+.mel-monitoring-grid textarea:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+.mel-auth-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.mel-auth-user {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--primary);
+}
+.btn-danger-sm {
+  background: var(--danger);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.8rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition);
+  white-space: nowrap;
+}
+.btn-danger-sm:hover {
+  background: #c0392b;
+}
 .mel-editor .actions-row {
   justify-content: flex-end;
   margin-top: 1rem;

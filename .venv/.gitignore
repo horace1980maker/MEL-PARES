@@ -1,0 +1,9 @@
+# Created by venv; see https://docs.python.org/3/library/venv.html
+# AI Coding Agent Directories
+.agent/
+.claude/
+.codex/
+
+# Exclude specifically if they exist
+.claude/logs/
+.claude/settings.local.json
