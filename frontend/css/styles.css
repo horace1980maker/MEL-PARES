@@ -813,6 +813,7 @@ body {
   margin-bottom: 1rem;
   max-width: 100%;
   overflow: hidden;
+  position: relative;
 }
 .module-subtitle {
   color: var(--text-light);
@@ -1045,24 +1046,33 @@ body {
   gap: 0.5rem;
 }
 .mel-auth-user {
+  font-family: 'Oswald', sans-serif;
   font-weight: 600;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-dark);
+  letter-spacing: 0.03em;
 }
-.btn-danger-sm {
-  background: var(--danger);
-  color: #fff;
-  border: none;
+.mel-toolbar-auth {
+  position: absolute;
+  top: 1rem;
+  right: 1.2rem;
+}
+.btn-outline-sm {
+  background: transparent;
+  color: var(--text-light);
+  border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 0.4rem 0.8rem;
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background var(--transition);
+  transition: all var(--transition);
   white-space: nowrap;
 }
-.btn-danger-sm:hover {
-  background: #c0392b;
+.btn-outline-sm:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-bg);
 }
 .mel-editor .actions-row {
   justify-content: flex-end;

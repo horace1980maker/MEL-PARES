@@ -60,6 +60,12 @@ registerModule('melSocios', async (container) => {
                     <div class="card-title">Matriz de indicadores general y por organizacion</div>
                     <p class="module-subtitle">Visualización general y detallada de los indicadores del proyecto por organización.</p>
                 </div>
+                <div class="mel-toolbar-auth">
+                    ${auth
+                        ? `<span class="mel-auth-info"><span class="mel-auth-user">${esc(auth.username).toUpperCase()}</span><button id="mel-logout" class="btn-outline-sm" title="Cerrar sesion">Cerrar sesion</button></span>`
+                        : `<button id="mel-login-toggle" class="btn-light">Ingreso socios</button>`
+                    }
+                </div>
                 <div class="mel-socios-actions">
                     <select id="mel-org-filter" class="filter-select" title="Organizacion">${orgOptions}</select>
                     <select id="mel-type-filter" class="filter-select">
@@ -68,10 +74,6 @@ registerModule('melSocios', async (container) => {
                         <option value="output">Outputs</option>
                     </select>
                     <input id="mel-search" class="filter-input" type="search" placeholder="Buscar indicador" />
-                    ${auth
-                        ? `<span class="mel-auth-info"><span class="mel-auth-user">${esc(auth.username)}</span><button id="mel-logout" class="btn-danger-sm" title="Cerrar sesion">Cerrar sesion</button></span>`
-                        : `<button id="mel-login-toggle" class="btn-light">Ingreso socios</button>`
-                    }
                 </div>
             </div>
 
