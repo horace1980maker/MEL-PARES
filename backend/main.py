@@ -23,6 +23,7 @@ from routes.agregacion import router as agr_router
 from routes.cortes import router as corte_router
 from routes.exportar import router as export_router
 from routes.mel_socios import router as mel_socios_router, seed_mel_socios
+from routes.mel_proyecto import router as mel_proyecto_router, seed_mel_proyecto
 
 # Crear tablas al iniciar
 Base.metadata.create_all(bind=engine)
@@ -66,14 +67,16 @@ app.include_router(agr_router, prefix="/api/agregacion", tags=["Agregación"])
 app.include_router(corte_router, prefix="/api", tags=["Cortes"])
 app.include_router(export_router, prefix="/api", tags=["Exportar"])
 app.include_router(mel_socios_router, prefix="/api", tags=["MEL Socios"])
+app.include_router(mel_proyecto_router, prefix="/api", tags=["MEL Proyecto"])
 
 
 @app.on_event("startup")
-def cargar_mel_socios():
+def cargar_mel_tablas():
     from database import SessionLocal
     db = SessionLocal()
     try:
         seed_mel_socios(db)
+        seed_mel_proyecto(db)
     finally:
         db.close()
 

@@ -17,6 +17,9 @@ function navigate(hash) {
         'mel-socios': 'melSocios',
         'mel_socios': 'melSocios',
         melsocios: 'melSocios',
+        'mel-proyecto': 'melProyecto',
+        'mel_proyecto': 'melProyecto',
+        melproyecto: 'melProyecto',
     };
     const requestedModule = hash.replace('#', '') || 'inicio';
     const module = routeAliases[requestedModule] || requestedModule;
@@ -32,6 +35,7 @@ function navigate(hash) {
         inicio: 'Inicio',
         indicadores: 'Indicadores',
         melSocios: 'MEL socios',
+        melProyecto: 'MEL Proyecto',
         ruta: 'Ruta del Proyecto',
         comparador: 'Comparador de Cambio',
         aprendizaje: 'Aprendizaje',

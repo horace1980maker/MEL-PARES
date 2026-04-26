@@ -117,7 +117,6 @@ registerModule('melSocios', async (container) => {
                                 <th>Mon. 4</th>
                                 <th>Total acumulado</th>
                                 <th>Meta numerica</th>
-                                <th>Avance</th>
                             </tr>
                         </thead>
                         <tbody id="mel-rows"></tbody>
@@ -125,13 +124,15 @@ registerModule('melSocios', async (container) => {
                 </div>
             </section>
 
-            <section class="card mel-edit-card ${canEditSelected ? '' : 'is-locked'}">
-                <div class="card-header">
-                    <h2 class="card-title">Ingreso y edicion de datos por indicador</h2>
-                    <span id="mel-edit-badge" class="badge ${canEditSelected ? 'badge-media' : 'badge-baja'}">${canEditSelected ? 'Sesion activa' : 'Solo lectura'}</span>
-                </div>
-                <div id="mel-edit-panel"></div>
-            </section>
+            ${auth ? `
+                <section class="card mel-edit-card ${canEditSelected ? '' : 'is-locked'}">
+                    <div class="card-header">
+                        <h2 class="card-title">Ingreso y edicion de datos por indicador</h2>
+                        <span id="mel-edit-badge" class="badge ${canEditSelected ? 'badge-media' : 'badge-baja'}">${canEditSelected ? 'Sesion activa' : 'Solo lectura'}</span>
+                    </div>
+                    <div id="mel-edit-panel"></div>
+                </section>
+            ` : ''}
         `;
 
         const renderSummary = (list, summary = resumen) => {
@@ -160,7 +161,7 @@ registerModule('melSocios', async (container) => {
                 ? `${rowsToRender.length} de ${list.length} visibles`
                 : `${list.length} visibles`;
             container.querySelector('#mel-rows').innerHTML = rowsToRender.map(row => `
-                <tr data-id="${row.id}">
+                <tr class="mel-data-row" data-id="${row.id}">
                     <td>${esc(row.organizacion)}</td>
                     <td><span class="badge badge-${row.tipo === 'output' ? 'media' : 'alta'}">${esc(row.tipo)}</span></td>
                     <td class="mel-long-cell">${esc(row.descripcion_esperada)}</td>
@@ -169,7 +170,14 @@ registerModule('melSocios', async (container) => {
                     <td>${esc(row.monitoring[0])}</td><td>${esc(row.monitoring[1])}</td><td>${esc(row.monitoring[2])}</td><td>${esc(row.monitoring[3])}</td>
                     <td><strong>${esc(row.total_acumulado)}</strong></td>
                     <td>${esc(row.meta_numerica)}</td>
-                    <td><div class="mel-progress-cell"><span>${fmtPct(row.porcentaje_avance)}</span><div class="progress-bar"><div class="progress-fill" style="width:${pctWidth(row.porcentaje_avance)}%"></div></div></div></td>
+                </tr>
+                <tr class="mel-progress-row" data-id="${row.id}">
+                    <td colspan="11">
+                        <div class="mel-row-progress">
+                            <span>Avance ${fmtPct(row.porcentaje_avance)}</span>
+                            <div class="progress-bar"><div class="progress-fill" style="width:${pctWidth(row.porcentaje_avance)}%"></div></div>
+                        </div>
+                    </td>
                 </tr>
             `).join('');
 
@@ -179,12 +187,14 @@ registerModule('melSocios', async (container) => {
         };
 
         const renderEditor = (row) => {
+            const panel = container.querySelector('#mel-edit-panel');
+            if (!panel || !row) return;
             const editable = auth && (auth.organizacion === 'Todas' || auth.organizacion === row.organizacion);
             const disabled = editable ? '' : 'disabled';
             const options = currentList().map(item =>
                 `<option value="${item.id}" ${item.id === row.id ? 'selected' : ''}>${esc(item.organizacion)} | ${esc(item.indicador).slice(0, 110)}</option>`
             ).join('');
-            container.querySelector('#mel-edit-panel').innerHTML = `
+            panel.innerHTML = `
                 <div class="mel-editor">
                     <label class="mel-entry-select">Indicador
                         <select id="mel-entry-indicator">${options}</select>
@@ -287,7 +297,7 @@ registerModule('melSocios', async (container) => {
 
         renderSummary(records);
         renderRows(records);
-        if (records.length) renderEditor(records[0]);
+        if (auth && records.length) renderEditor(records[0]);
     } catch (e) {
         container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">!</div><div class="empty-state-text">Error al cargar MEL socios: ${e.message}</div></div>`;
     }

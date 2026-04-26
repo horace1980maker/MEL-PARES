@@ -69,4 +69,8 @@ const api = {
     melSociosOrganizaciones: () => api.get(`${API_BASE}/mel-socios/organizaciones`),
     melSociosLogin: (data) => api.post('/mel-socios/login', data),
     melSociosUpdate: (id, data, token) => api.patchAuth(`/mel-socios/${id}`, data, token),
+    melProyecto: (params) => api.get(`${API_BASE}/mel-proyecto`, params),
+    melProyectoResumen: () => api.get(`${API_BASE}/mel-proyecto/resumen`),
+    melProyectoLogin: (data) => api.post('/mel-proyecto/login', data),
+    melProyectoUpdate: (id, data, token) => api.patchAuth(`/mel-proyecto/${id}`, data, token),
 };
