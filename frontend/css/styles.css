@@ -1183,6 +1183,35 @@ body {
   margin-bottom: 1rem;
   min-width: 0;
 }
+.mel-lq-card {
+  margin-bottom: 1rem;
+}
+.mel-lq-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+.mel-lq-item {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 0.6rem;
+  align-items: start;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 0.8rem;
+  background: var(--navy-bg);
+}
+.mel-lq-item strong {
+  color: var(--primary-dark);
+  font-family: var(--font-title);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+.mel-lq-item span {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
 .mel-proyecto-list {
   display: grid;
   grid-template-columns: 1fr;
@@ -1214,6 +1243,32 @@ body {
   font-size: 0.75rem;
   font-weight: 700;
 }
+.mel-proyecto-related-lqs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.35rem 0 0.55rem;
+}
+.mel-proyecto-related-lqs b {
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.mel-proyecto-related-lqs span {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+.mel-proyecto-related-lqs em {
+  color: var(--primary-dark);
+  background: var(--primary-bg);
+  border-radius: var(--radius-sm);
+  font-size: 0.72rem;
+  font-style: normal;
+  font-weight: 700;
+  padding: 0.18rem 0.45rem;
+}
 .mel-proyecto-item h3 {
   font-size: 0.98rem;
   line-height: 1.35;
@@ -1233,6 +1288,28 @@ body {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+.mel-proyecto-notas {
+  border-left: 3px solid var(--primary);
+  background: var(--navy-bg);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.75rem;
+  margin: 0.65rem 0 0.8rem;
+}
+.mel-proyecto-notas b {
+  display: block;
+  color: var(--text);
+  font-size: 0.78rem;
+  margin-bottom: 0.25rem;
+}
+.mel-proyecto-notas p {
+  display: block;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  white-space: pre-line;
+  overflow: visible;
 }
 .mel-proyecto-meta {
   display: grid;
@@ -1420,6 +1497,8 @@ body {
   .mel-socios-grid { grid-template-columns: 1fr; }
   .mel-proyecto-toolbar { align-items: stretch; }
   .mel-proyecto-actions { grid-template-columns: 1fr; max-width: none; }
+  .mel-lq-grid { grid-template-columns: 1fr; }
+  .mel-lq-item { grid-template-columns: 48px minmax(0, 1fr); }
   .mel-proyecto-list { grid-template-columns: 1fr; }
   .mel-proyecto-meta { grid-template-columns: 1fr; }
   .mel-edit-fields { grid-template-columns: 1fr; }

@@ -21,6 +21,22 @@ registerModule('melProyecto', async (container) => {
     const pctLabel = (value) => `${pct(value)}%`;
     const pctWidth = (value) => Math.max(0, Math.min(100, pct(value)));
     const textValue = (value) => clean(value) === '-' ? '' : esc(value);
+    const lqCodes = (value) => {
+        const matches = String(value || '').match(/LQ?\s*\d+/gi) || [];
+        return [...new Set(matches.map(match => `LQ${match.match(/\d+/)[0]}`))];
+    };
+    const learningQuestions = [
+        ['LQ1', '¿Cómo ha evolucionado la capacidad organizacional para realizar análisis de vulnerabilidad y fragilidad en paisajes sensibles al conflicto?'],
+        ['LQ2', '¿Qué factores han facilitado o limitado el fortalecimiento de capacidades en las organizaciones?'],
+        ['LQ3', '¿En qué medida el Dashboard resulta útil para facilitar decisiones estratégicas en los paisajes intervenidos?'],
+        ['LQ4', '¿Qué elementos del enfoque son percibidos como más útiles y replicables por las organizaciones?'],
+        ['LQ5', '¿Cómo ha evolucionado la comprensión y aplicación del enfoque paz–seguridad–cambio climático en las organizaciones beneficiarias?'],
+        ['LQ6', '¿Qué tan inclusivas y sensibles al género han sido las intervenciones implementadas, según la percepción de las comunidades beneficiarias?'],
+        ['LQ7', '¿Qué beneficios o cambios concretos perciben las comunidades tras la implementación de las intervenciones?'],
+        ['LQ8', '¿Qué factores han facilitado o limitado la participación de mujeres y jóvenes en la implementación de actividades?'],
+        ['LQ9', '¿Qué aprendizajes han surgido de la implementación de la Comunidad de Práctica?'],
+        ['LQ10', '¿Cómo ha contribuido la Comunidad de Práctica a la escalabilidad y sostenibilidad de soluciones en el nexo paz-seguridad-cambio climático?'],
+    ];
 
     try {
         const [summary, records] = await Promise.all([
@@ -62,6 +78,20 @@ registerModule('melProyecto', async (container) => {
                 <div class="summary-chip"><strong>${summary.incompletos}</strong> Fuente incompleta</div>
             </div>
 
+            <section class="card mel-lq-card">
+                <div class="card-header">
+                    <h2 class="card-title">Preguntas de aprendizaje</h2>
+                </div>
+                <div class="mel-lq-grid">
+                    ${learningQuestions.map(([code, question]) => `
+                        <div class="mel-lq-item">
+                            <strong>${esc(code)}</strong>
+                            <span>${esc(question)}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </section>
+
             <section class="card mel-proyecto-list-card">
                 <div class="card-header">
                     <h2 class="card-title">Indicadores del proyecto</h2>
@@ -98,11 +128,22 @@ registerModule('melProyecto', async (container) => {
                 <article class="mel-proyecto-item ${row.id === selectedId ? 'is-selected' : ''}" data-id="${row.id}">
                     <div class="mel-proyecto-item-head">
                         <span class="badge badge-${row.tipo === 'output' ? 'media' : 'alta'}">${esc(row.tipo)}</span>
-                        <span class="mel-proyecto-lq">${esc(row.lq)}</span>
                         ${row.estado_fuente === 'incompleto' ? '<span class="badge badge-baja">Fuente incompleta</span>' : ''}
                     </div>
                     <h3>${esc(row.indicador)}</h3>
+                    ${lqCodes(row.lq).length ? `
+                        <div class="mel-proyecto-related-lqs">
+                            <b>Preguntas relacionadas:</b>
+                            <span>${lqCodes(row.lq).map(code => `<em>${esc(code)}</em>`).join('')}</span>
+                        </div>
+                    ` : ''}
                     <p>${esc(row.nivel)}</p>
+                    ${row.notas ? `
+                        <div class="mel-proyecto-notas">
+                            <b>Notas</b>
+                            <p>${esc(row.notas)}</p>
+                        </div>
+                    ` : ''}
                     <div class="mel-proyecto-meta">
                         <span><b>Linea base</b>${esc(row.linea_base)}</span>
                         <span><b>Avance</b>${pctLabel(row.porcentaje_avance)}</span>
