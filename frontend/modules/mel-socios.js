@@ -74,6 +74,7 @@ registerModule('melSocios', async (container) => {
                         <option value="output">Outputs</option>
                     </select>
                     <input id="mel-search" class="filter-input" type="search" placeholder="Buscar indicador" />
+                    <button id="mel-export-xlsx" class="btn-light" type="button">Exportar XLS</button>
                 </div>
             </div>
 
@@ -262,6 +263,24 @@ registerModule('melSocios', async (container) => {
 
         container.querySelector('#mel-type-filter').addEventListener('change', () => renderRows(currentList()));
         container.querySelector('#mel-search').addEventListener('input', () => renderRows(currentList()));
+        container.querySelector('#mel-export-xlsx').addEventListener('click', async (event) => {
+            const button = event.currentTarget;
+            const original = button.textContent;
+            button.textContent = 'Exportando...';
+            button.disabled = true;
+            try {
+                await api.melSociosExport({
+                    organizacion: container.querySelector('#mel-org-filter').value,
+                    tipo: container.querySelector('#mel-type-filter').value,
+                    search: container.querySelector('#mel-search').value.trim(),
+                });
+            } catch (err) {
+                alert(`No se pudo exportar: ${err.message}`);
+            } finally {
+                button.textContent = original;
+                button.disabled = false;
+            }
+        });
         if (auth) {
             container.querySelector('#mel-logout').addEventListener('click', () => {
                 localStorage.removeItem(authKey);

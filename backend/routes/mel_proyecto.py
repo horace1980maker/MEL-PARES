@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database import get_db
 from models.mel_proyecto import MelProyectoIndicador
+from xlsx_export import xlsx_response
 
 router = APIRouter()
 
@@ -240,6 +241,21 @@ def _out(row):
     }
 
 
+def _filtered_query(db, tipo=None, search=None):
+    q = db.query(MelProyectoIndicador)
+    if tipo and tipo != "all":
+        q = q.filter(MelProyectoIndicador.tipo == tipo)
+    if search:
+        like = f"%{search}%"
+        q = q.filter(
+            (MelProyectoIndicador.indicador.ilike(like)) |
+            (MelProyectoIndicador.nivel.ilike(like)) |
+            (MelProyectoIndicador.lq.ilike(like)) |
+            (MelProyectoIndicador.notas.ilike(like))
+        )
+    return q.order_by(MelProyectoIndicador.tipo, MelProyectoIndicador.excel_row)
+
+
 @router.post("/mel-proyecto/login")
 def login(data: LoginIn):
     username = data.username.strip().lower()
@@ -251,18 +267,30 @@ def login(data: LoginIn):
 @router.get("/mel-proyecto")
 def listar(tipo: Optional[str] = None, search: Optional[str] = None, db: Session = Depends(get_db)):
     seed_mel_proyecto(db)
-    q = db.query(MelProyectoIndicador)
-    if tipo and tipo != "all":
-        q = q.filter(MelProyectoIndicador.tipo == tipo)
-    if search:
-        like = f"%{search}%"
-        q = q.filter(
-            (MelProyectoIndicador.indicador.ilike(like)) |
-            (MelProyectoIndicador.nivel.ilike(like)) |
-            (MelProyectoIndicador.lq.ilike(like))
-        )
-    rows = q.order_by(MelProyectoIndicador.tipo, MelProyectoIndicador.excel_row).all()
+    rows = _filtered_query(db, tipo, search).all()
     return [_out(row) for row in rows]
+
+
+@router.get("/mel-proyecto/export")
+def exportar_xlsx(tipo: Optional[str] = None, search: Optional[str] = None, db: Session = Depends(get_db)):
+    seed_mel_proyecto(db)
+    rows = _filtered_query(db, tipo, search).all()
+    headers = [
+        "Fila Excel", "Tipo", "Nivel / Output", "Indicador", "Herramienta / medio",
+        "Linea base", "Meta", "Meta numerica", "Valor actual", "Avance",
+        "Fuente de informacion", "Frecuencia", "LQ", "Notas", "Estado fuente",
+        "Actualizado por", "Actualizado en",
+    ]
+    data = [
+        [
+            row.excel_row, row.tipo, row.nivel, row.indicador, row.herramienta,
+            row.linea_base, row.meta, row.meta_numerica, row.valor_actual, row.porcentaje_avance,
+            row.fuente_informacion, row.frecuencia, row.lq, row.notas, row.estado_fuente,
+            row.updated_by, row.updated_at.isoformat() if row.updated_at else None,
+        ]
+        for row in rows
+    ]
+    return xlsx_response("mel-proyecto.xlsx", "MEL Proyecto", headers, data, percent_columns={10})
 
 
 @router.get("/mel-proyecto/resumen")

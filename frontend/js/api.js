@@ -50,6 +50,23 @@ const api = {
         return res.json();
     },
 
+    async download(endpoint, filename, params = {}) {
+        const url = new URL(endpoint, window.location.origin);
+        Object.entries(params).forEach(([k, v]) => {
+            if (v !== null && v !== undefined && v !== '') url.searchParams.set(k, v);
+        });
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`API error: ${res.status}`);
+        const blob = await res.blob();
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(link.href);
+    },
+
     // Shortcuts
     indicadores: (params) => api.get(`${API_BASE}/indicadores`, params),
     preguntas: () => api.get(`${API_BASE}/preguntas`),
@@ -69,8 +86,10 @@ const api = {
     melSociosOrganizaciones: () => api.get(`${API_BASE}/mel-socios/organizaciones`),
     melSociosLogin: (data) => api.post('/mel-socios/login', data),
     melSociosUpdate: (id, data, token) => api.patchAuth(`/mel-socios/${id}`, data, token),
+    melSociosExport: (params) => api.download(`${API_BASE}/mel-socios/export`, 'mel-socios.xlsx', params),
     melProyecto: (params) => api.get(`${API_BASE}/mel-proyecto`, params),
     melProyectoResumen: () => api.get(`${API_BASE}/mel-proyecto/resumen`),
     melProyectoLogin: (data) => api.post('/mel-proyecto/login', data),
     melProyectoUpdate: (id, data, token) => api.patchAuth(`/mel-proyecto/${id}`, data, token),
+    melProyectoExport: (params) => api.download(`${API_BASE}/mel-proyecto/export`, 'mel-proyecto.xlsx', params),
 };

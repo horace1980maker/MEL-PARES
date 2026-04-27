@@ -835,7 +835,7 @@ body {
     "org"
     "type"
     "search"
-    "login";
+    "export";
   align-items: center;
   width: 100%;
 }
@@ -848,7 +848,7 @@ body {
 .mel-socios-actions #mel-org-filter { grid-area: org; }
 .mel-socios-actions #mel-type-filter { grid-area: type; }
 .mel-socios-actions #mel-search { grid-area: search; }
-.mel-socios-actions #mel-login-toggle { grid-area: login; }
+.mel-socios-actions #mel-export-xlsx { grid-area: export; }
 .mel-socios-actions .btn-light {
   white-space: nowrap;
   justify-self: start;
@@ -888,7 +888,7 @@ body {
   min-width: 0 !important;
   max-width: 100%;
 }
-.mel-socios-actions #mel-login-toggle { min-width: 150px !important; }
+.mel-socios-actions #mel-export-xlsx { min-width: 150px !important; }
 .btn-primary,
 .btn-light {
   border: 0;
@@ -1169,13 +1169,14 @@ body {
 }
 .mel-proyecto-actions {
   display: grid;
-  grid-template-columns: minmax(160px, 220px) minmax(220px, 1fr);
+  grid-template-columns: minmax(160px, 220px) minmax(220px, 1fr) auto;
   gap: 0.6rem;
   align-items: center;
-  max-width: 760px;
+  max-width: 920px;
 }
 .mel-proyecto-actions .filter-select,
-.mel-proyecto-actions .filter-input {
+.mel-proyecto-actions .filter-input,
+.mel-proyecto-actions .btn-light {
   width: 100%;
   min-width: 0;
 }
@@ -1491,7 +1492,7 @@ body {
       "org"
       "type"
       "search"
-      "login";
+      "export";
   }
   .mel-socios-actions > * { flex: 1 1 180px; }
   .mel-socios-grid { grid-template-columns: 1fr; }

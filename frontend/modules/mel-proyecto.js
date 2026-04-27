@@ -64,6 +64,7 @@ registerModule('melProyecto', async (container) => {
                         <option value="output">Outputs</option>
                     </select>
                     <input id="mel-proyecto-search" class="filter-input" type="search" placeholder="Buscar indicador, LQ o nivel" />
+                    <button id="mel-proyecto-export-xlsx" class="btn-light" type="button">Exportar XLS</button>
                 </div>
             </div>
 
@@ -278,6 +279,23 @@ registerModule('melProyecto', async (container) => {
             selectedId = currentList()[0]?.id || null;
             renderList();
             if (auth) renderEditor(records.find(row => row.id === selectedId));
+        });
+        container.querySelector('#mel-proyecto-export-xlsx').addEventListener('click', async (event) => {
+            const button = event.currentTarget;
+            const original = button.textContent;
+            button.textContent = 'Exportando...';
+            button.disabled = true;
+            try {
+                await api.melProyectoExport({
+                    tipo: container.querySelector('#mel-proyecto-type-filter').value,
+                    search: container.querySelector('#mel-proyecto-search').value.trim(),
+                });
+            } catch (err) {
+                alert(`No se pudo exportar: ${err.message}`);
+            } finally {
+                button.textContent = original;
+                button.disabled = false;
+            }
         });
 
         if (auth) {

@@ -17,6 +17,7 @@ import unicodedata
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from database import get_db
 from models.mel_socios import MelSocioIndicador
+from xlsx_export import xlsx_response
 
 router = APIRouter()
 
@@ -209,6 +210,18 @@ def _out(row):
     }
 
 
+def _filtered_query(db, organizacion=None, tipo=None, search=None):
+    q = db.query(MelSocioIndicador)
+    if organizacion and organizacion != "Todas":
+        q = q.filter(MelSocioIndicador.organizacion == organizacion)
+    if tipo and tipo != "all":
+        q = q.filter(MelSocioIndicador.tipo == tipo)
+    if search:
+        like = f"%{search}%"
+        q = q.filter((MelSocioIndicador.indicador.ilike(like)) | (MelSocioIndicador.descripcion_esperada.ilike(like)))
+    return q.order_by(MelSocioIndicador.organizacion, MelSocioIndicador.tipo, MelSocioIndicador.excel_row)
+
+
 @router.post("/mel-socios/login")
 def login(data: LoginIn, db: Session = Depends(get_db)):
     seed_mel_socios(db)
@@ -231,16 +244,33 @@ def organizaciones(db: Session = Depends(get_db)):
 @router.get("/mel-socios")
 def listar(organizacion: Optional[str] = None, tipo: Optional[str] = None, search: Optional[str] = None, db: Session = Depends(get_db)):
     seed_mel_socios(db)
-    q = db.query(MelSocioIndicador)
-    if organizacion and organizacion != "Todas":
-        q = q.filter(MelSocioIndicador.organizacion == organizacion)
-    if tipo and tipo != "all":
-        q = q.filter(MelSocioIndicador.tipo == tipo)
-    if search:
-        like = f"%{search}%"
-        q = q.filter((MelSocioIndicador.indicador.ilike(like)) | (MelSocioIndicador.descripcion_esperada.ilike(like)))
-    rows = q.order_by(MelSocioIndicador.organizacion, MelSocioIndicador.tipo, MelSocioIndicador.excel_row).all()
+    rows = _filtered_query(db, organizacion, tipo, search).all()
     return [_out(row) for row in rows]
+
+
+@router.get("/mel-socios/export")
+def exportar_xlsx(organizacion: Optional[str] = None, tipo: Optional[str] = None, search: Optional[str] = None, db: Session = Depends(get_db)):
+    seed_mel_socios(db)
+    rows = _filtered_query(db, organizacion, tipo, search).all()
+    headers = [
+        "Organizacion", "Hoja", "Fila Excel", "Tipo", "Descripcion esperada", "Indicador",
+        "Linea base", "Monitoreo 1", "Monitoreo 2", "Monitoreo 3", "Monitoreo 4",
+        "Total acumulado", "Meta numerica", "Avance", "Meta descriptiva",
+        "Observacion 1", "Observacion 2", "Observacion 3", "Observacion 4",
+        "Responsable", "Evidencia URL", "Estado validacion", "Actualizado por", "Actualizado en",
+    ]
+    data = [
+        [
+            row.organizacion, row.sheet, row.excel_row, row.tipo, row.descripcion_esperada, row.indicador,
+            row.linea_base, row.monitoreo_1, row.monitoreo_2, row.monitoreo_3, row.monitoreo_4,
+            row.total_acumulado, row.meta_numerica, row.porcentaje_avance, row.meta_descriptiva,
+            row.observacion_1, row.observacion_2, row.observacion_3, row.observacion_4,
+            row.responsable, row.evidencia_url, row.estado_validacion, row.updated_by,
+            row.updated_at.isoformat() if row.updated_at else None,
+        ]
+        for row in rows
+    ]
+    return xlsx_response("mel-socios.xlsx", "MEL Socios", headers, data, percent_columns={14})
 
 
 @router.get("/mel-socios/resumen")
