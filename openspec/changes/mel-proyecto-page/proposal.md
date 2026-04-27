@@ -10,6 +10,7 @@ El sistema necesita una pagina MEL Proyecto para dar seguimiento centralizado a 
 - Agregar un flujo de login exclusivo para administradores para habilitar edicion de indicadores y avances.
 - Permitir que administradores autenticados editen los campos del indicador y ajusten el avance mediante una barra deslizable.
 - Mantener la vista publica o no autenticada en modo lectura.
+- Permitir exportar los indicadores MEL Proyecto a XLSX para analisis externo.
 
 ## Capabilities
 
@@ -21,6 +22,6 @@ El sistema necesita una pagina MEL Proyecto para dar seguimiento centralizado a 
 ## Impact
 
 - Frontend: nueva vista/ruta MEL Proyecto, componentes de tabla/tarjetas de indicadores, barras de progreso y controles deslizables de edicion.
-- Backend: modelos, endpoints y persistencia para indicadores MEL Proyecto, avances y autenticacion/autorizacion exclusiva de administradores.
+- Backend: modelos, endpoints y persistencia para indicadores MEL Proyecto, avances, exportacion XLSX y autenticacion/autorizacion exclusiva de administradores.
 - Datos: carga inicial basada en `MEL PROPOSAL V6.xlsx`, con 10 indicadores unicos identificados entre Outcome y Output.
 - Seguridad: separacion entre lectura general y edicion autenticada.

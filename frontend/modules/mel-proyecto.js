@@ -4,6 +4,19 @@
 registerModule('melProyecto', async (container) => {
     const authKey = 'melProyectoAuth';
     let auth = null;
+    const learningQuestionLabels = [
+        ['LQ1', '¿Cómo ha evolucionado la capacidad organizacional para realizar análisis de vulnerabilidad y fragilidad en paisajes sensibles al conflicto?'],
+        ['LQ2', '¿Qué factores han facilitado o limitado el fortalecimiento de capacidades en las organizaciones?'],
+        ['LQ3', '¿En qué medida el Dashboard resulta útil para facilitar decisiones estratégicas en los paisajes intervenidos?'],
+        ['LQ4', '¿Qué elementos del enfoque son percibidos como más útiles y replicables por las organizaciones?'],
+        ['LQ5', '¿Cómo ha evolucionado la comprensión y aplicación del enfoque paz-seguridad-cambio climático en las organizaciones beneficiarias?'],
+        ['LQ6', '¿Qué tan inclusivas y sensibles al género han sido las intervenciones implementadas, según la percepción de las comunidades beneficiarias?'],
+        ['LQ7', '¿Qué beneficios o cambios concretos perciben las comunidades tras la implementación de las intervenciones?'],
+        ['LQ8', '¿Qué factores han facilitado o limitado la participación de mujeres y jóvenes en la implementación de actividades?'],
+        ['LQ9', '¿Qué aprendizajes han surgido de la implementación de la Comunidad de Práctica?'],
+        ['LQ10', '¿Cómo ha contribuido la Comunidad de Práctica a la escalabilidad y sostenibilidad de soluciones en el nexo paz-seguridad-cambio climático?'],
+    ];
+
     try {
         auth = JSON.parse(localStorage.getItem(authKey) || 'null');
     } catch (_) {
@@ -84,7 +97,7 @@ registerModule('melProyecto', async (container) => {
                     <h2 class="card-title">Preguntas de aprendizaje</h2>
                 </div>
                 <div class="mel-lq-grid">
-                    ${learningQuestions.map(([code, question]) => `
+                    ${learningQuestionLabels.map(([code, question]) => `
                         <div class="mel-lq-item">
                             <strong>${esc(code)}</strong>
                             <span>${esc(question)}</span>
@@ -139,6 +152,16 @@ registerModule('melProyecto', async (container) => {
                         </div>
                     ` : ''}
                     <p>${esc(row.nivel)}</p>
+                    <div class="mel-proyecto-context-grid">
+                        <div class="mel-proyecto-context-item">
+                            <b>Herramienta / medio</b>
+                            <span>${esc(row.herramienta)}</span>
+                        </div>
+                        <div class="mel-proyecto-context-item">
+                            <b>Fuente</b>
+                            <span>${esc(row.fuente_informacion)}</span>
+                        </div>
+                    </div>
                     ${row.notas ? `
                         <div class="mel-proyecto-notas">
                             <b>Notas</b>

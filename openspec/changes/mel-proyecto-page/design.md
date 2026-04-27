@@ -12,12 +12,13 @@ The Excel source contains 10 unique project indicators: 4 Outcome indicators and
 - Seed initial project indicators from `MEL PROPOSAL V6.xlsx`.
 - Show progress as horizontal bars, using the Excel Meta value as Avance and displaying it as a percentage.
 - Hide indicator editing until an admin is logged in, then let authenticated admins update indicator metadata and progress using a slider.
+- Export the current MEL Proyecto indicator dataset to XLSX for offline analysis.
 - Reuse existing API, router, styling, and simple token authentication conventions where practical.
 
 **Non-Goals:**
 - Replace the existing MEL socios matrix.
 - Implement full user management, password recovery, roles beyond project editor/admin, or external identity providers.
-- Build a complete Excel round-trip export unless later requested.
+- Round-trip edits back into the original source workbook.
 - Resolve incomplete UNEP indicator wording in the source file.
 
 ## Decisions
@@ -45,6 +46,10 @@ The Excel source contains 10 unique project indicators: 4 Outcome indicators and
 5. Implement the frontend as `frontend/modules/mel-proyecto.js`.
 
    Rationale: this mirrors the module system in `frontend/js/app.js`, keeps the page independently maintainable, and lets navigation add a route alias such as `#mel-proyecto`.
+
+6. Generate XLSX exports server-side with `openpyxl`.
+
+   Rationale: the deployed backend has the authoritative persisted data and already depends on `openpyxl`. Server-side generation keeps the export consistent across browsers and includes admin edits saved to the database.
 
 ## Risks / Trade-offs
 

@@ -35,10 +35,16 @@
 
 - [x] 5.1 Add MEL Proyecto styles to `frontend/css/styles.css` using the existing dashboard visual language.
 - [x] 5.2 Ensure progress bars, sliders, filters, and long indicator text remain readable on desktop and mobile widths.
-- [x] 5.3 Keep unauthenticated edit controls visibly read-only without hiding the indicator data.
+- [x] 5.3 Keep indicator data visible while hiding edit controls until an admin is logged in.
 
 ## 6. Verification
 
 - [x] 6.1 Run backend syntax checks with `python -m compileall backend`.
 - [x] 6.2 Run frontend syntax checks for changed JavaScript files with `node --check`.
 - [x] 6.3 Manually verify read-only load, login failure, login success, slider save, filter behavior, and incomplete-source display.
+- [x] 6.4 Add backend regression tests for seeding, admin-only login, authenticated update, filters, and XLSX export.
+
+## 7. Export
+
+- [x] 7.1 Add a backend XLSX export endpoint for MEL Proyecto indicators.
+- [x] 7.2 Add a frontend Exportar XLS action that respects current MEL Proyecto filters.

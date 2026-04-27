@@ -33,7 +33,6 @@ function navigate(hash) {
     // Título
     const titles = {
         inicio: 'Inicio',
-        indicadores: 'Indicadores',
         melSocios: 'MEL socios',
         melProyecto: 'MEL Proyecto',
         ruta: 'Ruta del Proyecto',

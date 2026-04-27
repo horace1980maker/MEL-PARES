@@ -3,7 +3,23 @@
  */
 registerModule('inicio', async (container, filters) => {
     try {
-        const resumen = await api.resumen();
+        const [proyectoResult, sociosResult, preguntasResult] = await Promise.allSettled([
+            api.melProyectoResumen(),
+            api.melSociosResumen({}),
+            api.preguntas(),
+        ]);
+
+        const proyecto = proyectoResult.status === 'fulfilled' ? proyectoResult.value : {};
+        const socios = sociosResult.status === 'fulfilled' ? sociosResult.value : {};
+        const preguntas = preguntasResult.status === 'fulfilled' ? preguntasResult.value : [];
+        const sociosBalance = Array.isArray(socios.balance) ? socios.balance : [];
+        const sociosOutcomes = sociosBalance.find(item => item.tipo === 'outcome')?.indicadores || 0;
+        const sociosOutputs = sociosBalance.find(item => item.tipo === 'output')?.indicadores || 0;
+        const totalIndicadores = (proyecto.total_indicadores || 0) + (socios.total_indicadores || 0);
+        const totalOutcomes = (proyecto.outcomes || 0) + sociosOutcomes;
+        const totalOutputs = (proyecto.outputs || 0) + sociosOutputs;
+        const totalLqs = Array.isArray(preguntas) && preguntas.length ? preguntas.length : 10;
+        const totalOrganizaciones = Array.isArray(socios.organizaciones) ? socios.organizaciones.length : 0;
 
         container.innerHTML = `
         <div class="intro-hero">
@@ -37,20 +53,20 @@ registerModule('inicio', async (container, filters) => {
 
         <div class="intro-stats">
             <div class="intro-stat card">
-                <div class="intro-stat-value">${resumen.total_mediciones || 0}</div>
-                <div class="intro-stat-label">Mediciones</div>
+                <div class="intro-stat-value">${totalIndicadores}</div>
+                <div class="intro-stat-label">Indicadores Acumulados</div>
             </div>
             <div class="intro-stat card">
-                <div class="intro-stat-value">${resumen.total_evidencias || 0}</div>
-                <div class="intro-stat-label">Evidencias</div>
+                <div class="intro-stat-value">${totalOutcomes}/${totalOutputs}</div>
+                <div class="intro-stat-label">Outcomes / Outputs</div>
             </div>
             <div class="intro-stat card">
-                <div class="intro-stat-value">${resumen.total_pilotos || 0}</div>
-                <div class="intro-stat-label">Pilotos</div>
+                <div class="intro-stat-value">${totalOrganizaciones}</div>
+                <div class="intro-stat-label">Organizaciones Socias</div>
             </div>
             <div class="intro-stat card">
-                <div class="intro-stat-value">${resumen.hitos_completados || 0}/${resumen.total_hitos || 0}</div>
-                <div class="intro-stat-label">Hitos Completados</div>
+                <div class="intro-stat-value">${totalLqs}</div>
+                <div class="intro-stat-label">Preguntas de Aprendizaje</div>
             </div>
         </div>
         `;

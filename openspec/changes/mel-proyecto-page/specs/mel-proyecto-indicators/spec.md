@@ -81,3 +81,14 @@ The system SHALL calculate summary values for the MEL Proyecto page.
 #### Scenario: Filters update visible indicators
 - **WHEN** a user filters by indicator type or searches indicator text
 - **THEN** the visible list and count reflect the selected filter
+
+### Requirement: MEL Proyecto indicators can be exported
+The system SHALL allow users to export MEL Proyecto indicator data as an XLSX file.
+
+#### Scenario: User exports current indicator data
+- **WHEN** a user clicks the MEL Proyecto export action
+- **THEN** the system downloads an XLSX file containing the current indicator dataset
+
+#### Scenario: Export respects filters
+- **WHEN** a user exports after applying a type or search filter
+- **THEN** the downloaded XLSX contains only indicators matching those filters
