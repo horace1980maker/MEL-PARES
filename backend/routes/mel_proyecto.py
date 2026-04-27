@@ -106,14 +106,7 @@ def _merge_text(current, incoming):
     return f"{current}\n\n{incoming}"
 
 
-def seed_mel_proyecto(db):
-    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    xlsx_path = os.path.join(root, "MEL PROPOSAL V6.xlsx")
-    if not os.path.exists(xlsx_path):
-        return
-    if db.query(MelProyectoIndicador).count() > 0:
-        return
-
+def build_mel_proyecto_records(xlsx_path):
     from openpyxl import load_workbook
 
     wb = load_workbook(xlsx_path, data_only=True)
@@ -178,8 +171,27 @@ def seed_mel_proyecto(db):
             "updated_by": "seed:excel",
         }
 
-    db.add_all(MelProyectoIndicador(**item) for item in pending.values())
+    return list(pending.values())
+
+
+def import_mel_proyecto_xlsx(db, xlsx_path, reset=False):
+    if reset:
+        db.query(MelProyectoIndicador).delete()
+        db.commit()
+    if db.query(MelProyectoIndicador).count() > 0:
+        return 0
+    records = build_mel_proyecto_records(xlsx_path)
+    db.add_all(MelProyectoIndicador(**item) for item in records)
     db.commit()
+    return len(records)
+
+
+def seed_mel_proyecto(db):
+    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    xlsx_path = os.path.join(root, "MEL PROPOSAL V6.xlsx")
+    if not os.path.exists(xlsx_path):
+        return
+    import_mel_proyecto_xlsx(db, xlsx_path, reset=False)
 
 
 class LoginIn(BaseModel):

@@ -16,6 +16,7 @@ COPY frontend/ ./frontend/
 
 # Copy the xlsx data file into the image
 COPY 20260424_Monitoreo-Cumplimiento-Proyectos-PARES.xlsx /app/data.xlsx
+COPY ["MEL PROPOSAL V6.xlsx", "/app/mel-proyecto.xlsx"]
 
 # Expose the port the app runs on
 EXPOSE 8000
