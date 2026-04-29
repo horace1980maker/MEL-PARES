@@ -7,10 +7,12 @@ from .changelog import ChangelogMedicion
 from .corte import Corte, CorteDetalle
 from .mel_socios import MelSocioIndicador
 from .mel_proyecto import MelProyectoIndicador
+from .ruta_timeline import RutaTimelineItem
 
 __all__ = [
     "Organizacion", "Paisaje", "Comunidad", "Piloto",
     "Indicador", "PreguntaDeAprendizaje", "Instrumento", "Hito",
     "Medicion", "Evidencia", "EvidenciaIndicador", "EvidenciaLQ", "EvidenciaHito",
     "ChangelogMedicion", "Corte", "CorteDetalle", "MelSocioIndicador", "MelProyectoIndicador",
+    "RutaTimelineItem",
 ]

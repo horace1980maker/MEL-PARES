@@ -24,6 +24,7 @@ from routes.cortes import router as corte_router
 from routes.exportar import router as export_router
 from routes.mel_socios import router as mel_socios_router, seed_mel_socios
 from routes.mel_proyecto import router as mel_proyecto_router, seed_mel_proyecto
+from routes.ruta_timeline import router as ruta_timeline_router, seed_ruta_timeline
 
 # Crear tablas al iniciar
 Base.metadata.create_all(bind=engine)
@@ -68,6 +69,7 @@ app.include_router(corte_router, prefix="/api", tags=["Cortes"])
 app.include_router(export_router, prefix="/api", tags=["Exportar"])
 app.include_router(mel_socios_router, prefix="/api", tags=["MEL Socios"])
 app.include_router(mel_proyecto_router, prefix="/api", tags=["MEL Proyecto"])
+app.include_router(ruta_timeline_router, prefix="/api", tags=["Ruta Timeline"])
 
 
 @app.on_event("startup")
@@ -77,6 +79,7 @@ def cargar_mel_tablas():
     try:
         seed_mel_socios(db)
         seed_mel_proyecto(db)
+        seed_ruta_timeline(db)
     finally:
         db.close()
 

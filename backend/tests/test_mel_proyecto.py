@@ -15,6 +15,7 @@ sys.path.insert(0, str(BACKEND_DIR))
 from fastapi.testclient import TestClient  # noqa: E402
 from database import engine  # noqa: E402
 from main import app  # noqa: E402
+from routes.mel_proyecto import build_mel_proyecto_records  # noqa: E402
 
 
 class MelProyectoTestCase(unittest.TestCase):
@@ -34,12 +35,16 @@ class MelProyectoTestCase(unittest.TestCase):
     def test_seed_summary_and_incomplete_indicator(self):
         items = self.client.get("/api/mel-proyecto").json()
         summary = self.client.get("/api/mel-proyecto/resumen").json()
+        expected = build_mel_proyecto_records(ROOT / "MEL PROPOSAL V6.xlsx")
+        expected_outcomes = sum(1 for row in expected if row["tipo"] == "outcome")
+        expected_outputs = sum(1 for row in expected if row["tipo"] == "output")
+        expected_incomplete = sum(1 for row in expected if row["estado_fuente"] == "incompleto")
 
-        self.assertEqual(len(items), 10)
-        self.assertEqual(summary["total_indicadores"], 10)
-        self.assertEqual(summary["outcomes"], 4)
-        self.assertEqual(summary["outputs"], 6)
-        self.assertEqual(summary["incompletos"], 1)
+        self.assertEqual(len(items), len(expected))
+        self.assertEqual(summary["total_indicadores"], len(expected))
+        self.assertEqual(summary["outcomes"], expected_outcomes)
+        self.assertEqual(summary["outputs"], expected_outputs)
+        self.assertEqual(summary["incompletos"], expected_incomplete)
         self.assertTrue(any(item["estado_fuente"] == "incompleto" for item in items))
         self.assertIn("herramienta", items[0])
         self.assertIn("fuente_informacion", items[0])
@@ -81,8 +86,10 @@ class MelProyectoTestCase(unittest.TestCase):
     def test_filter_and_xlsx_export(self):
         outcomes = self.client.get("/api/mel-proyecto", params={"tipo": "outcome"}).json()
         export = self.client.get("/api/mel-proyecto/export", params={"tipo": "outcome"})
+        expected = build_mel_proyecto_records(ROOT / "MEL PROPOSAL V6.xlsx")
+        expected_outcomes = sum(1 for row in expected if row["tipo"] == "outcome")
 
-        self.assertEqual(len(outcomes), 4)
+        self.assertEqual(len(outcomes), expected_outcomes)
         self.assertEqual(export.status_code, 200)
         self.assertEqual(
             export.headers["content-type"],

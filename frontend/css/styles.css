@@ -639,6 +639,26 @@ body {
 .ruta-warning {
   margin-top: 0.9rem;
 }
+.ruta-admin-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin: -0.25rem 0 0.8rem;
+}
+.ruta-edit-card {
+  margin-top: 1rem;
+}
+.ruta-editor .actions-row {
+  align-items: center;
+  display: flex;
+  gap: 0.8rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+#ruta-login-error,
+#ruta-save-status {
+  color: var(--danger);
+  font-size: 0.8rem;
+}
 
 /* ===== Comparator ===== */
 .comparator-controls {

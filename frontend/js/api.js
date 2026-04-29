@@ -92,4 +92,7 @@ const api = {
     melProyectoLogin: (data) => api.post('/mel-proyecto/login', data),
     melProyectoUpdate: (id, data, token) => api.patchAuth(`/mel-proyecto/${id}`, data, token),
     melProyectoExport: (params) => api.download(`${API_BASE}/mel-proyecto/export`, 'mel-proyecto.xlsx', params),
+    rutaTimeline: () => api.get(`${API_BASE}/ruta/timeline`),
+    rutaLogin: (data) => api.post('/ruta/login', data),
+    rutaTimelineUpdate: (id, data, token) => api.patchAuth(`/ruta/timeline/${id}`, data, token),
 };

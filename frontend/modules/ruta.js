@@ -1,275 +1,289 @@
 /**
- * Modulo Ruta del Proyecto - linea de tiempo de hitos con contexto MEL.
+ * Modulo Ruta del Proyecto - linea de tiempo editable de entregables.
  */
 registerModule('ruta', async (container) => {
-    const clean = (value) => value === null || value === undefined || value === '' ? '-' : String(value);
+    const authKey = 'rutaTimelineAuth';
+    let auth = null;
+    try {
+        auth = JSON.parse(localStorage.getItem(authKey) || 'null');
+    } catch (_) {
+        auth = null;
+    }
+
+    const clean = (value) => value === null || value === undefined || value === '' ? '-' : String(value).trim();
     const esc = (value) => clean(value)
         .replaceAll('&', '&amp;')
         .replaceAll('<', '&lt;')
         .replaceAll('>', '&gt;')
         .replaceAll('"', '&quot;')
         .replaceAll("'", '&#039;');
-    const pct = (value) => Math.round((Number(value) || 0) * 100);
-    const pctWidth = (value) => Math.max(0, Math.min(100, pct(value)));
-    const normalize = (value) => String(value || '').toLowerCase();
-    const compact = (value, max = 170) => {
-        const text = String(value || '').replace(/\s+/g, ' ').trim();
-        return text.length > max ? `${text.slice(0, max - 1)}...` : text;
+    const normalize = (value) => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const textValue = (value) => clean(value) === '-' ? '' : esc(value);
+    const monthEnd = {
+        enero: '01-31',
+        febrero: '02-28',
+        marzo: '03-31',
+        abril: '04-30',
+        mayo: '05-31',
+        junio: '06-30',
+        julio: '07-31',
+        agosto: '08-31',
+        septiembre: '09-30',
+        octubre: '10-31',
+        noviembre: '11-30',
+        diciembre: '12-31',
     };
-    const formatDate = (value) => {
-        if (!value) return 'Sin fecha';
-        const date = new Date(`${value}T00:00:00`);
-        if (Number.isNaN(date.getTime())) return esc(value);
-        return date.toLocaleDateString('es-GT', { day: '2-digit', month: 'short', year: 'numeric' });
+    const monthOptions = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const plannedDate = (item) => `${item.anio || '2026'}-${monthEnd[normalize(item.mes)] || '12-31'}`;
+    const formatDate = (item) => {
+        if (!item.anio || !item.mes) return 'Sin fecha';
+        const date = new Date(`${plannedDate(item)}T00:00:00`);
+        if (Number.isNaN(date.getTime())) return `${esc(item.mes)} ${esc(item.anio)}`;
+        return date.toLocaleDateString('es-GT', { month: 'short', year: 'numeric' });
     };
-    const lqCodes = (value) => {
-        const matches = String(value || '').match(/LQ?\s*\d+/gi) || [];
-        return [...new Set(matches.map(match => `LQ${match.match(/\d+/)[0]}`))];
-    };
+    const routeState = (estado) => normalize(estado).includes('entregado') ? 'completado' : 'en_progreso';
     const statusLabel = (estado) => clean(estado).replace('_', ' ');
-    const statusBadge = (estado) => {
-        if (estado === 'completado') return 'alta';
-        if (estado === 'en_progreso') return 'media';
-        return 'baja';
-    };
+    const statusBadge = (estado) => routeState(estado) === 'completado' ? 'alta' : 'media';
+    const outputLabel = (output) => `Output ${clean(output)}`;
+    const sortTimeline = (items) => [...items].sort((a, b) => {
+        const byDate = plannedDate(a).localeCompare(plannedDate(b));
+        return byDate || ((Number(a.orden) || 0) - (Number(b.orden) || 0));
+    });
 
-    const deriveHitosFromMel = (records) => {
-        if (!records.length) return [];
-        const hasOutput = records.some(row => row.tipo === 'output');
-        const hasOutcome = records.some(row => row.tipo === 'outcome');
-        return [
-            {
-                nombre: 'Linea base y preparacion MEL',
-                estado: 'completado',
-                responsable: 'Equipo MEL',
-                fecha_planificada: '2025-04-30',
-                descripcion: 'Momento inferido desde indicadores con linea base, herramientas de verificacion y primeras frecuencias de seguimiento.',
-                inferido: true,
-            },
-            {
-                nombre: 'Fortalecimiento y hojas de ruta',
-                estado: hasOutput ? 'en_progreso' : 'pendiente',
-                responsable: 'CATIE / organizaciones socias',
-                fecha_planificada: '2025-07-31',
-                descripcion: 'Momento inferido desde indicadores de capacitacion, ToT, hojas de ruta, peer learning y validacion de estrategias.',
-                inferido: true,
-            },
-            {
-                nombre: 'Implementacion y monitoreo de pilotos',
-                estado: hasOutput ? 'en_progreso' : 'pendiente',
-                responsable: 'Organizaciones beneficiarias',
-                fecha_planificada: '2026-07-31',
-                descripcion: 'Momento inferido desde indicadores de implementacion, visitas de verificacion, entrevistas, matrices de monitoreo e informes.',
-                inferido: true,
-            },
-            {
-                nombre: 'Aprendizaje, escalabilidad y cierre',
-                estado: hasOutcome ? 'pendiente' : 'en_progreso',
-                responsable: 'CATIE / UNEP',
-                fecha_planificada: '2026-11-30',
-                descripcion: 'Momento inferido desde LQ, Comunidad de Practica, dialogos interregionales, reportes de cierre y evidencias de aprendizaje.',
-                inferido: true,
-            },
-        ];
-    };
+    try {
+        const records = await api.rutaTimeline();
+        let timelineItems = sortTimeline(records);
+        let selectedId = timelineItems.find(item => routeState(item.estado) === 'en_progreso')?.id || timelineItems[0]?.id || null;
 
-    const allSettled = await Promise.allSettled([
-        api.hitos({}),
-        api.melProyecto({}),
-    ]);
+        const selectedItem = () => timelineItems.find(item => item.id === selectedId) || timelineItems[0];
+        const selectIndex = (item) => timelineItems.findIndex(row => row.id === item?.id);
 
-    let hitos = allSettled[0].status === 'fulfilled' ? allSettled[0].value : [];
-    const melRecords = allSettled[1].status === 'fulfilled' ? allSettled[1].value : [];
-    const melAvailable = allSettled[1].status === 'fulfilled' && melRecords.length > 0;
-    if (!hitos.length && melAvailable) {
-        hitos = deriveHitosFromMel(melRecords);
-    }
-
-    if (!hitos.length) {
-        const errorText = allSettled[0].status === 'rejected' ? `Error: ${esc(allSettled[0].reason.message)}` : 'No hay hitos registrados';
-        container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">[ ]</div><div class="empty-state-text">${errorText}</div></div>`;
-        return;
-    }
-
-    const sortedHitos = [...hitos].sort((a, b) => String(a.fecha_planificada || '').localeCompare(String(b.fecha_planificada || '')));
-    let selectedIndex = Math.max(0, sortedHitos.findIndex(h => h.estado === 'en_progreso'));
-    if (selectedIndex === -1) selectedIndex = 0;
-
-    const summarizeMel = (records) => {
-        const total = records.length;
-        const progressValues = records.map(row => Number(row.porcentaje_avance) || 0);
-        const avgProgress = total ? progressValues.reduce((sum, value) => sum + value, 0) / total : 0;
-        const complete = records.filter(row => (Number(row.porcentaje_avance) || 0) >= 1).length;
-        const incompleteSources = records.filter(row => row.estado_fuente === 'incompleto');
-        const lagging = records.filter(row => (Number(row.porcentaje_avance) || 0) < 0.35);
-        const updated = records
-            .map(row => row.updated_at)
-            .filter(Boolean)
-            .sort()
-            .at(-1);
-        const lqs = [...new Set(records.flatMap(row => lqCodes(row.lq)))].sort((a, b) => Number(a.slice(2)) - Number(b.slice(2)));
-        const frequencies = [...new Set(records.map(row => clean(row.frecuencia)).filter(value => value !== '-'))].slice(0, 4);
-        const notes = records
-            .map(row => compact(row.notas, 150))
-            .filter(Boolean)
-            .slice(0, 3);
-
-        return {
-            total,
-            avgProgress,
-            complete,
-            incompleteSources,
-            lagging,
-            updated,
-            lqs,
-            frequencies,
-            notes,
-        };
-    };
-
-    const globalSummary = summarizeMel(melRecords);
-    const contextForHito = (hito, index) => {
-        if (!melAvailable) return summarizeMel([]);
-
-        const name = normalize(hito.nombre);
-        let records = melRecords;
-        if (name.includes('outcome') || name.includes('evaluacion') || name.includes('cierre')) {
-            records = melRecords.filter(row => row.tipo === 'outcome');
-        } else if (name.includes('output') || name.includes('reporte') || name.includes('monitoreo') || name.includes('pilotos')) {
-            records = melRecords.filter(row => row.tipo === 'output');
-        } else if (name.includes('aprendizaje') || name.includes('taller')) {
-            records = melRecords.filter(row => lqCodes(row.lq).some(code => Number(code.slice(2)) >= 3));
-        } else if (name.includes('linea base') || name.includes('preparacion')) {
-            records = melRecords.filter(row => row.linea_base || row.herramienta);
-        } else if (name.includes('fortalecimiento') || name.includes('hojas de ruta')) {
-            records = melRecords.filter(row => normalize(row.indicador).includes('capacidad') || normalize(row.indicador).includes('hoja'));
-        }
-
-        if (!records.length) records = melRecords;
-        const summary = summarizeMel(records);
-        const planned = new Date(`${hito.fecha_planificada || ''}T00:00:00`).getTime();
-        const overdue = hito.estado !== 'completado' && planned && planned < Date.now();
-        return { ...summary, overdue, scopeCount: records.length };
-    };
-
-    const timelineContexts = sortedHitos.map(contextForHito);
-
-    const renderSummaryChips = () => `
-        <div class="ruta-summary">
-            <div class="ruta-summary-chip"><strong>${sortedHitos.length}</strong><span>hitos</span></div>
-            <div class="ruta-summary-chip"><strong>${pct(globalSummary.avgProgress)}%</strong><span>avance MEL</span></div>
-            <div class="ruta-summary-chip"><strong>${globalSummary.complete}/${globalSummary.total || 0}</strong><span>indicadores cumplidos</span></div>
-            <div class="ruta-summary-chip ${globalSummary.incompleteSources.length ? 'is-warning' : ''}">
-                <strong>${globalSummary.incompleteSources.length}</strong><span>fuentes por completar</span>
-            </div>
-        </div>`;
-
-    const renderTimeline = () => {
-        const items = sortedHitos.map((hito, index) => {
-            const estado = hito.estado || 'pendiente';
-            const context = timelineContexts[index];
-            const progress = melAvailable ? context.avgProgress : (estado === 'completado' ? 1 : estado === 'en_progreso' ? 0.55 : 0.08);
-            const stateClass = context.overdue ? 'rezago' : estado;
-            const sourceClass = context.incompleteSources.length ? 'fuente-incompleta' : '';
+        const renderSummaryChips = () => {
+            const delivered = timelineItems.filter(item => routeState(item.estado) === 'completado').length;
+            const inProgress = timelineItems.filter(item => routeState(item.estado) === 'en_progreso').length;
+            const outputs = [...new Set(timelineItems.map(item => item.output).filter(Boolean))].length;
             return `
-                <button class="ruta-timeline-item ${index === selectedIndex ? 'is-selected' : ''} ${stateClass} ${sourceClass}" type="button" data-index="${index}">
-                    <span class="ruta-node ${stateClass}"></span>
-                    <span class="ruta-date">${formatDate(hito.fecha_planificada)}</span>
-                    <span class="ruta-title">${esc(hito.nombre)}</span>
-                    <span class="ruta-card-meta">
-                        <span class="badge badge-${statusBadge(estado)}">${esc(statusLabel(estado))}</span>
-                        ${hito.inferido ? '<span class="ruta-derived-flag">Inferido</span>' : ''}
-                        ${context.incompleteSources.length ? '<span class="ruta-source-flag">Fuente</span>' : ''}
-                    </span>
-                    <span class="ruta-progress-label">${melAvailable ? `${pct(progress)}% MEL` : 'Sin contexto MEL'}</span>
-                    <span class="progress-bar ruta-progress"><span class="progress-fill" style="width:${pctWidth(progress)}%"></span></span>
-                </button>`;
-        }).join('');
+                <div class="ruta-summary">
+                    <div class="ruta-summary-chip"><strong>${timelineItems.length}</strong><span>entregables</span></div>
+                    <div class="ruta-summary-chip"><strong>${delivered}</strong><span>entregados</span></div>
+                    <div class="ruta-summary-chip"><strong>${inProgress}</strong><span>en proceso</span></div>
+                    <div class="ruta-summary-chip"><strong>${outputs}</strong><span>outputs</span></div>
+                </div>`;
+        };
 
-        return `<div class="ruta-timeline-shell"><div class="ruta-timeline-rail">${items}</div></div>`;
-    };
+        const renderTimeline = () => {
+            const items = timelineItems.map((item) => {
+                const estado = routeState(item.estado);
+                return `
+                    <button class="ruta-timeline-item ${item.id === selectedId ? 'is-selected' : ''} ${estado}" type="button" data-id="${item.id}">
+                        <span class="ruta-node ${estado}"></span>
+                        <span class="ruta-date">${formatDate(item)}</span>
+                        <span class="ruta-title">${esc(item.entregable)}</span>
+                        <span class="ruta-card-meta">
+                            <span class="badge badge-${statusBadge(item.estado)}">${esc(statusLabel(item.estado))}</span>
+                            <span class="ruta-derived-flag">${esc(outputLabel(item.output))}</span>
+                        </span>
+                        <span class="ruta-progress-label">${esc(item.codigo)} - Orden ${String(item.orden || '').padStart(2, '0')}</span>
+                    </button>`;
+            }).join('');
 
-    const renderDetail = () => {
-        const hito = sortedHitos[selectedIndex];
-        const estado = hito.estado || 'pendiente';
-        const context = timelineContexts[selectedIndex];
-        const lqs = context.lqs.length ? context.lqs.map(code => `<span class="tag">${esc(code)}</span>`).join('') : '<span class="ruta-muted">Sin LQ inferidas</span>';
-        const frequencies = context.frequencies.length ? context.frequencies.map(value => `<li>${esc(compact(value, 120))}</li>`).join('') : '<li>Sin frecuencia registrada</li>';
-        const notes = context.notes.length ? context.notes.map(value => `<li>${esc(value)}</li>`).join('') : '<li>Sin notas MEL relacionadas</li>';
-        const updated = context.updated ? formatDate(context.updated.slice(0, 10)) : 'Sin actualizacion registrada';
+            return `<div class="ruta-timeline-shell"><div class="ruta-timeline-rail">${items}</div></div>`;
+        };
 
-        return `
-            <section class="ruta-detail card">
-                <div class="ruta-detail-main">
-                    <div>
-                        <div class="ruta-kicker">Hito seleccionado</div>
-                        <h3>${esc(hito.nombre)}</h3>
+        const renderDetail = () => {
+            const item = selectedItem();
+            if (!item) return '<div class="empty-state-text">No hay entregables registrados en TIMELINE</div>';
+            return `
+                <section class="ruta-detail card">
+                    <div class="ruta-detail-main">
+                        <div>
+                            <div class="ruta-kicker">Entregable seleccionado</div>
+                            <h3>${esc(item.entregable)}</h3>
+                        </div>
+                        <span class="badge badge-${statusBadge(item.estado)}">${esc(statusLabel(item.estado))}</span>
                     </div>
-                    <span class="badge badge-${statusBadge(estado)}">${esc(statusLabel(estado))}</span>
-                </div>
-                <p class="ruta-detail-description">${esc(hito.descripcion || 'Sin descripcion adicional')}</p>
-                ${hito.inferido ? '<p class="ruta-derived-note">Este momento fue inferido desde MEL Proyecto porque no hay hitos registrados en la base local.</p>' : ''}
-                <div class="ruta-detail-grid">
-                    <div><b>Fecha planificada</b><span>${formatDate(hito.fecha_planificada)}</span></div>
-                    <div><b>Fecha real</b><span>${formatDate(hito.fecha_real)}</span></div>
-                    <div><b>Responsable</b><span>${esc(hito.responsable || 'Sin responsable')}</span></div>
-                    <div><b>Ultima actualizacion MEL</b><span>${updated}</span></div>
-                </div>
-                <div class="ruta-insight-grid">
-                    <div class="ruta-insight">
-                        <span>Avance inferido</span>
-                        <strong>${melAvailable ? `${pct(context.avgProgress)}%` : 'N/D'}</strong>
-                        <div class="progress-bar"><div class="progress-fill" style="width:${pctWidth(context.avgProgress)}%"></div></div>
+                    <p class="ruta-detail-description">${esc(item.codigo)} - ${esc(outputLabel(item.output))}. Entregable ${esc(item.orden)} programado para ${esc(item.mes)} ${esc(item.anio)}.</p>
+                    <div class="ruta-detail-grid">
+                        <div><b>No. entregable</b><span>${esc(item.codigo)}</span></div>
+                        <div><b>Output</b><span>${esc(outputLabel(item.output))}</span></div>
+                        <div><b>Fecha programada</b><span>${formatDate(item)}</span></div>
+                        <div><b>Fuente</b><span>MEL PROPOSAL V6.xlsx / TIMELINE</span></div>
                     </div>
-                    <div class="ruta-insight">
-                        <span>Indicadores en contexto</span>
-                        <strong>${melAvailable ? context.scopeCount : 0}</strong>
-                        <small>${context.complete} cumplidos</small>
+                    <div class="ruta-insight-grid">
+                        <div class="ruta-insight">
+                            <span>Orden TIMELINE</span>
+                            <strong>${esc(item.orden)}</strong>
+                            <small>Secuencia de la hoja</small>
+                        </div>
+                        <div class="ruta-insight">
+                            <span>Estado</span>
+                            <strong>${esc(item.estado)}</strong>
+                            <small>Campo Estado</small>
+                        </div>
+                        <div class="ruta-insight">
+                            <span>Periodo</span>
+                            <strong>${esc(item.mes)}</strong>
+                            <small>${esc(item.anio)}</small>
+                        </div>
                     </div>
-                    <div class="ruta-insight ${context.incompleteSources.length ? 'is-warning' : ''}">
-                        <span>Fuentes por revisar</span>
-                        <strong>${context.incompleteSources.length}</strong>
-                        <small>${context.lagging.length} con bajo avance</small>
-                    </div>
-                </div>
-                <div class="ruta-context-columns">
-                    <div>
-                        <b>LQ relacionadas</b>
-                        <div class="ruta-tags">${lqs}</div>
-                    </div>
-                    <div>
-                        <b>Frecuencias / momentos</b>
-                        <ul>${frequencies}</ul>
-                    </div>
-                    <div>
-                        <b>Notas MEL relevantes</b>
-                        <ul>${notes}</ul>
-                    </div>
-                </div>
-                ${melAvailable ? '' : '<p class="ruta-warning">La ruta se muestra con hitos existentes porque MEL Proyecto no devolvio contexto de indicadores.</p>'}
-            </section>`;
-    };
+                </section>`;
+        };
 
-    const render = () => {
-        container.innerHTML = `
-            <div class="ruta-header">
-                <div>
-                    <h2 class="section-title">Linea de Tiempo del Proyecto</h2>
-                    <p class="module-subtitle">Ruta visual con hitos y senales de avance inferidas desde MEL Proyecto.</p>
-                </div>
-                ${renderSummaryChips()}
-            </div>
-            ${renderTimeline()}
-            <div id="ruta-detail-slot">${renderDetail()}</div>`;
+        const renderEditor = () => {
+            if (!auth) return '';
+            const item = selectedItem();
+            if (!item) return '<section class="card ruta-edit-card"><div class="empty-state-text">Sin entregable seleccionado</div></section>';
+            const monthSelect = monthOptions.map(month =>
+                `<option value="${month}" ${normalize(item.mes) === normalize(month) ? 'selected' : ''}>${month}</option>`
+            ).join('');
+            return `
+                <section class="card ruta-edit-card">
+                    <div class="card-header">
+                        <h2 class="card-title">Edicion de TIMELINE</h2>
+                        <span class="badge badge-media">Admin activo</span>
+                    </div>
+                    <div class="ruta-editor">
+                        <label class="mel-entry-select">Entregable
+                            <select id="ruta-entry">
+                                ${timelineItems.map(row => `<option value="${row.id}" ${row.id === item.id ? 'selected' : ''}>${String(row.orden || '').padStart(2, '0')} | ${esc(row.codigo)} | ${esc(row.entregable).slice(0, 90)}</option>`).join('')}
+                            </select>
+                        </label>
+                        <div class="mel-edit-fields">
+                            <label>No. Entregable<input data-field="codigo" value="${textValue(item.codigo)}"></label>
+                            <label>Output<input data-field="output" value="${textValue(item.output)}"></label>
+                            <label>Orden<input data-field="orden" type="number" min="1" step="1" value="${textValue(item.orden)}"></label>
+                            <label>Ano<input data-field="anio" type="number" min="2020" max="2100" step="1" value="${textValue(item.anio)}"></label>
+                            <label>Mes
+                                <select data-field="mes">${monthSelect}</select>
+                            </label>
+                            <label>Estado
+                                <select data-field="estado">
+                                    <option value="Entregado" ${normalize(item.estado).includes('entregado') ? 'selected' : ''}>Entregado</option>
+                                    <option value="En proceso" ${normalize(item.estado).includes('proceso') ? 'selected' : ''}>En proceso</option>
+                                </select>
+                            </label>
+                            <label class="span-2">Entregable<textarea data-field="entregable">${textValue(item.entregable)}</textarea></label>
+                        </div>
+                        <div class="actions-row">
+                            <button id="ruta-save" class="btn-primary" type="button">Guardar cambios</button>
+                            <span id="ruta-save-status"></span>
+                        </div>
+                    </div>
+                </section>`;
+        };
 
-        container.querySelectorAll('.ruta-timeline-item').forEach(item => {
-            item.addEventListener('click', () => {
-                selectedIndex = Number(item.dataset.index);
-                container.querySelectorAll('.ruta-timeline-item').forEach(node => node.classList.toggle('is-selected', Number(node.dataset.index) === selectedIndex));
-                container.querySelector('#ruta-detail-slot').innerHTML = renderDetail();
+        const bindInteractions = () => {
+            container.querySelectorAll('.ruta-timeline-item').forEach(node => {
+                node.addEventListener('click', () => {
+                    selectedId = Number(node.dataset.id);
+                    render();
+                });
             });
-        });
-    };
 
-    render();
+            const entry = container.querySelector('#ruta-entry');
+            if (entry) {
+                entry.addEventListener('change', (event) => {
+                    selectedId = Number(event.target.value);
+                    render();
+                });
+            }
+
+            const save = container.querySelector('#ruta-save');
+            if (save) {
+                save.addEventListener('click', async () => {
+                    const item = selectedItem();
+                    const panel = container.querySelector('.ruta-editor');
+                    const status = container.querySelector('#ruta-save-status');
+                    const payload = {};
+                    panel.querySelectorAll('[data-field]').forEach(field => {
+                        if (['orden', 'anio'].includes(field.dataset.field)) {
+                            payload[field.dataset.field] = field.value === '' ? null : Number(field.value);
+                        } else {
+                            payload[field.dataset.field] = field.value;
+                        }
+                    });
+                    save.disabled = true;
+                    save.textContent = 'Guardando...';
+                    status.textContent = '';
+                    try {
+                        const updated = await api.rutaTimelineUpdate(item.id, payload, auth.token);
+                        const index = timelineItems.findIndex(row => row.id === updated.id);
+                        if (index >= 0) timelineItems[index] = updated;
+                        timelineItems = sortTimeline(timelineItems);
+                        selectedId = updated.id;
+                        render();
+                    } catch (err) {
+                        save.disabled = false;
+                        save.textContent = 'Guardar cambios';
+                        status.textContent = err.message;
+                    }
+                });
+            }
+
+            const loginToggle = container.querySelector('#ruta-login-toggle');
+            if (loginToggle) {
+                loginToggle.addEventListener('click', () => {
+                    container.querySelector('#ruta-login-panel').innerHTML = `
+                        <form id="ruta-login-form" class="mel-login">
+                            <label>Usuario admin<input name="username" autocomplete="username" required placeholder="admin"></label>
+                            <label>Contrasena<input name="password" type="password" autocomplete="current-password" required></label>
+                            <button class="btn-primary" type="submit">Ingresar</button>
+                            <span id="ruta-login-error"></span>
+                        </form>`;
+                    container.querySelector('#ruta-login-form').addEventListener('submit', async (event) => {
+                        event.preventDefault();
+                        const form = new FormData(event.target);
+                        try {
+                            const session = await api.rutaLogin({
+                                username: form.get('username'),
+                                password: form.get('password'),
+                            });
+                            localStorage.setItem(authKey, JSON.stringify(session));
+                            auth = session;
+                            render();
+                        } catch (err) {
+                            container.querySelector('#ruta-login-error').textContent = err.message;
+                        }
+                    });
+                });
+            }
+
+            const logout = container.querySelector('#ruta-logout');
+            if (logout) {
+                logout.addEventListener('click', () => {
+                    localStorage.removeItem(authKey);
+                    auth = null;
+                    render();
+                });
+            }
+        };
+
+        const render = () => {
+            const selected = selectedItem();
+            if (selected && selectIndex(selected) === -1) selectedId = timelineItems[0]?.id || null;
+            container.innerHTML = `
+                <div class="ruta-header">
+                    <div>
+                        <h2 class="section-title">Linea de Tiempo del Proyecto</h2>
+                        <p class="module-subtitle">Ruta independiente construida con los entregables de la hoja TIMELINE.</p>
+                    </div>
+                    ${renderSummaryChips()}
+                </div>
+                <div class="ruta-admin-bar">
+                    ${auth
+                        ? `<span class="mel-auth-info"><span class="mel-auth-user">${esc(auth.username).toUpperCase()}</span><button id="ruta-logout" class="btn-outline-sm" type="button">Cerrar sesion</button></span>`
+                        : `<button id="ruta-login-toggle" class="btn-light" type="button">Ingreso admin</button>`
+                    }
+                </div>
+                <div id="ruta-login-panel" class="mel-login-panel"></div>
+                ${renderTimeline()}
+                <div id="ruta-detail-slot">${renderDetail()}</div>
+                ${renderEditor()}`;
+            bindInteractions();
+        };
+
+        render();
+    } catch (e) {
+        container.innerHTML = `<div class="empty-state"><div class="empty-state-icon">!</div><div class="empty-state-text">Error al cargar Ruta: ${esc(e.message)}</div></div>`;
+    }
 });
