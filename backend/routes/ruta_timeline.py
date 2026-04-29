@@ -24,6 +24,18 @@ ADMIN_USER = os.environ.get("RUTA_ADMIN_USER", os.environ.get("MEL_PROYECTO_ADMI
 ADMIN_PASSWORD = os.environ.get("RUTA_ADMIN_PASSWORD", os.environ.get("MEL_PROYECTO_ADMIN_PASSWORD", "AdminPARES2026!"))
 
 
+def _workbook_path():
+    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    candidates = [
+        os.environ.get("RUTA_TIMELINE_XLSX"),
+        os.environ.get("MEL_PROYECTO_XLSX"),
+        os.path.join(root, "MEL PROPOSAL V6.xlsx"),
+        os.path.join(root, "mel-proyecto.xlsx"),
+        "/app/mel-proyecto.xlsx",
+    ]
+    return next((path for path in candidates if path and os.path.exists(path)), None)
+
+
 def _text(value):
     if value is None:
         return None
@@ -132,9 +144,8 @@ def import_ruta_timeline_xlsx(db, xlsx_path, reset=False):
 
 
 def seed_ruta_timeline(db):
-    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    xlsx_path = os.path.join(root, "MEL PROPOSAL V6.xlsx")
-    if not os.path.exists(xlsx_path):
+    xlsx_path = _workbook_path()
+    if not xlsx_path:
         return
     import_ruta_timeline_xlsx(db, xlsx_path, reset=False)
 

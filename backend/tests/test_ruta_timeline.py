@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import tempfile
 import unittest
@@ -15,7 +16,7 @@ sys.path.insert(0, str(BACKEND_DIR))
 from fastapi.testclient import TestClient  # noqa: E402
 from database import Base, engine  # noqa: E402
 from main import app  # noqa: E402
-from routes.ruta_timeline import build_ruta_timeline_records  # noqa: E402
+from routes.ruta_timeline import build_ruta_timeline_records, _workbook_path  # noqa: E402
 
 
 class RutaTimelineTestCase(unittest.TestCase):
@@ -45,7 +46,22 @@ class RutaTimelineTestCase(unittest.TestCase):
         self.assertIn("entregable", items[0])
         self.assertIn("estado", items[0])
 
-    def test_02_admin_only_update_all_timeline_fields(self):
+    def test_02_workbook_lookup_supports_deployed_filename(self):
+        original = os.environ.get("RUTA_TIMELINE_XLSX")
+        with tempfile.TemporaryDirectory() as tmp:
+            deployed_path = Path(tmp) / "mel-proyecto.xlsx"
+            shutil.copy2(ROOT / "MEL PROPOSAL V6.xlsx", deployed_path)
+            os.environ["RUTA_TIMELINE_XLSX"] = str(deployed_path)
+            try:
+                self.assertEqual(Path(_workbook_path()), deployed_path)
+                self.assertGreater(len(build_ruta_timeline_records(_workbook_path())), 0)
+            finally:
+                if original is None:
+                    os.environ.pop("RUTA_TIMELINE_XLSX", None)
+                else:
+                    os.environ["RUTA_TIMELINE_XLSX"] = original
+
+    def test_03_admin_only_update_all_timeline_fields(self):
         item = self.client.get("/api/ruta/timeline").json()[0]
 
         no_auth = self.client.patch(
