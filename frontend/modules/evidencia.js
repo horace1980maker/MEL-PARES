@@ -6,7 +6,7 @@ const evidenceEntryLinks = [
     { title: 'Comunidad de Práctica', href: 'https://experience.arcgis.com/experience/7f1f2abe7d874cbabf720e371ed8d87f/page/Inicio?draft=true&views=Comunidad-de-pr%C3%A1cticas' },
     { title: 'Voces del Territorio', href: 'https://experience.arcgis.com/experience/7f1f2abe7d874cbabf720e371ed8d87f/page/Inicio?draft=true&views=Voces-del-territorio' },
     { title: 'Galería y Noticias', href: 'https://experience.arcgis.com/experience/7f1f2abe7d874cbabf720e371ed8d87f/page/Inicio?draft=true&views=Galer%C3%ADa-y-noticias' },
-    { title: 'Mapa Interactivo', href: '#evidencia' },
+    { title: 'Mapa Interactivo', href: 'https://experience.arcgis.com/experience/7f1f2abe7d874cbabf720e371ed8d87f/page/Mapa-interactivo?draft=true&views=Acerca-del-proyecto' },
 ];
 
 registerModule('evidencia', (container) => {

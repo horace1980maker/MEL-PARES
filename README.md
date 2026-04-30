@@ -2,7 +2,7 @@
 
 **Dashboard web para el Sistema de Monitoreo, Evaluación y Aprendizaje (MEL) del Proyecto PARES — CATIE.**
 
-MEL-PARES es una aplicación web de página única (SPA) diseñada para centralizar la gestión de indicadores, mediciones, evidencias e hitos del Proyecto PARES. Permite a los equipos de campo y tomadores de decisión visualizar el progreso de intervenciones por organización, paisaje y piloto, comparar valores actuales contra líneas base y metas, y documentar hallazgos de aprendizaje con trazabilidad completa.
+MEL-PARES es una aplicación web de página única (SPA) diseñada para centralizar la gestión de indicadores, mediciones, evidencias e hitos del Proyecto PARES. Permite a los equipos de campo y tomadores de decisión visualizar el progreso de intervenciones por organización, paisaje y piloto, mantener indicadores MEL y documentar evidencia con trazabilidad completa.
 
 ---
 
@@ -11,7 +11,7 @@ MEL-PARES es una aplicación web de página única (SPA) diseñada para centrali
 ```mermaid
 flowchart TD
     FE["🖥️ FRONTEND\nSPA · HTML/JS/CSS puro"]
-    FE --- F1["Módulos: inicio · indicadores · ruta\ncomparador · aprendizaje · inclusión\nterritorio · evidencia"]
+    FE --- F1["Módulos activos: inicio · MEL socios · MEL Proyecto\nruta · evidencia"]
     FE --- F2["Chart.js 4.4 · Leaflet 1.9 · PWA"]
 
     FE -- "HTTP / JSON" --> BE
@@ -88,12 +88,9 @@ MEL-PARES/
 │   │   └── app.js           # Router por hash, registro de módulos, filtros globales
 │   ├── modules/
 │   │   ├── inicio.js        # Pantalla de inicio con KPIs y semáforos
-│   │   ├── indicadores.js   # Vista detallada de indicadores (outputs y outcomes)
+│   │   ├── mel-socios.js    # Indicadores MEL por organización socia
+│   │   ├── mel-proyecto.js  # Indicadores MEL Proyecto desde MEL PROPOSAL V6.xlsx / Sheet1
 │   │   ├── ruta.js          # Timeline de hitos del proyecto
-│   │   ├── comparador.js    # Comparador: baseline vs actual vs meta
-│   │   ├── aprendizaje.js   # Preguntas de aprendizaje (LQ1–LQ10)
-│   │   ├── inclusion.js     # Matrices de inclusión por piloto
-│   │   ├── territorio.js    # Mapa interactivo con Leaflet
 │   │   └── evidencia.js     # Repositorio de evidencia filtrable
 │   ├── icons/               # Íconos PWA
 │   └── logos/               # Logos institucionales (EU, UNEP, CATIE)
@@ -232,29 +229,17 @@ La aplicación frontend es una **SPA (Single Page Application)** que utiliza **r
 
 Panel principal con KPIs de resumen: total de organizaciones, paisajes, pilotos, mediciones, evidencias e hitos. Muestra el avance general del proyecto con indicadores de semáforo.
 
-### 📊 Indicadores
+### 📊 MEL socios
 
-Vista detallada de los 10 indicadores (6 outputs + 4 outcomes). Para cada indicador muestra el código, nombre, valores baseline/actual/meta, barra de progreso calculada y calificación de calidad de evidencia.
+Vista de indicadores por organización socia con filtros y edición protegida para seguimiento de avances.
+
+### 📊 MEL Proyecto
+
+Vista de indicadores agregados del proyecto construida desde `MEL PROPOSAL V6.xlsx` / `Sheet1`. Muestra campos de fuente como instrumento de medición, evidencia, línea base, meta, avance, porcentaje, fuente de información, frecuencia, LQ y notas, con edición protegida para administradores.
 
 ### 🗓️ Ruta del Proyecto
 
 Timeline visual de hitos del proyecto con estados (pendiente, en progreso, completado), fechas planificadas vs. reales y responsables asignados.
-
-### 📈 Comparador de Cambio
-
-Herramienta interactiva para seleccionar un indicador y una unidad de análisis (organización, paisaje o piloto) y visualizar la comparación baseline → actual → meta, con serie histórica mediante gráficos Chart.js.
-
-### 💡 Aprendizaje
-
-Navegación por las 10 preguntas de aprendizaje (LQ1–LQ10), mostrando indicadores asociados, hallazgos documentados y evidencia vinculada.
-
-### 🤝 Inclusión
-
-Matrices por piloto para la integración de medidas de inclusión y participación activa, con checklist de criterios y evidencias asociadas.
-
-### 🗺️ Territorio
-
-Mapa interactivo (Leaflet) que geolocaliza paisajes y pilotos. Incluye fichas informativas por paisaje y panel comparativo de outcomes sociales.
 
 ### 📁 Repositorio de Evidencia
 
@@ -345,7 +330,7 @@ cd backend
 python seed.py
 ```
 
-Esto puebla la base de datos con los indicadores, preguntas de aprendizaje, instrumentos e hitos de referencia del Proyecto PARES.
+Esto puebla la base de datos con los indicadores, preguntas de aprendizaje, instrumentos e hitos de referencia del Proyecto PARES. Los indicadores MEL Proyecto se cargan desde `MEL PROPOSAL V6.xlsx`, usando exclusivamente la hoja `Sheet1`.
 
 ---
 
@@ -381,7 +366,7 @@ MEL-PARES es una PWA instalable en dispositivos móviles y de escritorio:
 **Proyecto PARES** es una iniciativa del CATIE en el marco del **EU-UNEP Partnership**. El sistema MEL gestiona:
 
 - **10 preguntas de aprendizaje** (LQ1–LQ10) que guían la reflexión estratégica.
-- **10 indicadores**: 6 de tipo _output_ (productos directos) y 4 de tipo _outcome_ (resultados de cambio).
+- **Indicadores MEL Proyecto**: definidos por la hoja `Sheet1` de `MEL PROPOSAL V6.xlsx`.
 - **Instrumentos activos**: encuestas pre/post individuales, encuesta organizacional, pausas reflexivas, sesiones de aprendizaje entre pares, entrevistas semiestructuradas, matrices de monitoreo y registros de campo.
 - **Ventanas de medición**: alineadas a hitos como ToT1/ToT2 (2025), validación de hojas de ruta, sesiones CoP, visitas de verificación y encuentros interregionales.
 

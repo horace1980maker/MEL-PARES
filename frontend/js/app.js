@@ -42,9 +42,6 @@ function navigate(hash) {
         melSocios: 'MEL socios',
         melProyecto: 'MEL Proyecto',
         ruta: 'Ruta del Proyecto',
-        comparador: 'Comparador de Cambio',
-        aprendizaje: 'Aprendizaje',
-        inclusion: 'Inclusión',
         territorio: 'Territorio',
         evidencia: 'Repositorio de Evidencia',
     };

@@ -136,9 +136,6 @@ body {
   border-left-color: var(--primary);
   font-weight: 600;
 }
-.nav-link[data-module="comparador"],
-.nav-link[data-module="aprendizaje"],
-.nav-link[data-module="inclusion"],
 .nav-link[data-module="territorio"] {
   display: none;
 }
@@ -713,107 +710,6 @@ body {
 }
 .data-table tr:hover td {
   background: var(--primary-bg);
-}
-
-/* ===== LQ Navigation ===== */
-.lq-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-bottom: 1.2rem;
-}
-.lq-tab {
-  padding: 0.45rem 1rem;
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--text-light);
-  cursor: pointer;
-  transition: all var(--transition);
-  background: var(--bg-card);
-}
-.lq-tab:hover {
-  border-color: var(--primary);
-  color: var(--primary);
-  background: var(--primary-bg);
-}
-.lq-tab.active {
-  background: var(--primary);
-  color: #fff;
-  border-color: var(--primary);
-}
-
-/* ===== Inclusion Matrix ===== */
-.matrix-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
-}
-.checklist-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem 0;
-  font-size: 0.84rem;
-}
-.checklist-icon {
-  font-size: 1rem;
-}
-
-/* Interactive checklist (Inclusion) */
-.checklist-interactive {
-  cursor: pointer;
-  user-select: none;
-  padding: 0.5rem 0.3rem;
-  border-radius: var(--radius-xs);
-  transition: background var(--transition);
-}
-.checklist-interactive:hover {
-  background: var(--primary-bg);
-}
-.checklist-interactive input[type="checkbox"] {
-  display: none;
-}
-.check-custom {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border: 2px solid var(--border);
-  border-radius: 6px;
-  background: var(--bg-card);
-  flex-shrink: 0;
-  transition: all 0.2s ease;
-  font-size: 0;
-}
-.checklist-interactive input:checked + .check-custom {
-  background: var(--primary);
-  border-color: transparent;
-}
-.checklist-interactive input:checked + .check-custom::after {
-  content: "✓";
-  color: #fff;
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-.checklist-interactive input:checked ~ span:last-child {
-  text-decoration: line-through;
-  color: var(--text-muted);
-}
-.inclusion-card .inclusion-saved-toast {
-  font-size: 0.72rem;
-  color: var(--success);
-  font-weight: 500;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  text-align: right;
-  height: 1rem;
-  margin-top: 0.3rem;
-}
-.inclusion-card .inclusion-saved-toast.show {
-  opacity: 1;
 }
 
 /* ===== Map ===== */
@@ -1776,7 +1672,6 @@ body {
   .top-bar { padding-left: 4.2rem; }
   .kpi-grid { grid-template-columns: 1fr; }
   .evidence-grid { grid-template-columns: 1fr; }
-  .matrix-grid { grid-template-columns: 1fr; }
   .mel-socios-toolbar { align-items: stretch; flex-direction: column; }
   .mel-socios-actions {
     align-items: stretch;

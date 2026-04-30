@@ -154,8 +154,12 @@ registerModule('melProyecto', async (container) => {
                     <p>${esc(row.nivel)}</p>
                     <div class="mel-proyecto-context-grid">
                         <div class="mel-proyecto-context-item">
-                            <b>Herramienta / medio</b>
+                            <b>Instrumento de medicion</b>
                             <span>${esc(row.herramienta)}</span>
+                        </div>
+                        <div class="mel-proyecto-context-item">
+                            <b>Evidencia</b>
+                            <span>${esc(row.evidencia)}</span>
                         </div>
                         <div class="mel-proyecto-context-item">
                             <b>Fuente</b>
@@ -170,7 +174,9 @@ registerModule('melProyecto', async (container) => {
                     ` : ''}
                     <div class="mel-proyecto-meta">
                         <span><b>Linea base</b>${esc(row.linea_base)}</span>
-                        <span><b>Avance</b>${pctLabel(row.porcentaje_avance)}</span>
+                        <span><b>Meta</b>${esc(row.meta)}</span>
+                        <span><b>Avance fuente</b>${esc(row.avance)}</span>
+                        <span><b>Porcentaje</b>${pctLabel(row.porcentaje_avance)}</span>
                         <span><b>Frecuencia</b>${esc(row.frecuencia)}</span>
                     </div>
                     <div class="mel-progress-cell">
@@ -218,12 +224,15 @@ registerModule('melProyecto', async (container) => {
                             </select>
                         </label>
                         <label>Linea base<input ${disabled} data-field="linea_base" value="${textValue(row.linea_base)}"></label>
-                        <label>Avance origen (%)<input ${disabled} data-field="meta" value="${textValue(row.meta)}"></label>
+                        <label>Meta<input ${disabled} data-field="meta" value="${textValue(row.meta)}"></label>
+                        <label>Avance fuente<input ${disabled} data-field="avance" value="${textValue(row.avance)}"></label>
+                        <label>Porcentaje fuente<input ${disabled} data-field="porcentaje" value="${textValue(row.porcentaje)}"></label>
                         <label class="span-2">Nivel / Output<textarea ${disabled} data-field="nivel">${textValue(row.nivel)}</textarea></label>
                         <label class="span-2">Indicador<textarea ${disabled} data-field="indicador">${textValue(row.indicador)}</textarea></label>
-                        <label class="span-2">Herramienta / medio de verificacion<textarea ${disabled} data-field="herramienta">${textValue(row.herramienta)}</textarea></label>
+                        <label class="span-2">Instrumento de medicion<textarea ${disabled} data-field="herramienta">${textValue(row.herramienta)}</textarea></label>
+                        <label class="span-2">Evidencia<textarea ${disabled} data-field="evidencia">${textValue(row.evidencia)}</textarea></label>
                         <label>Meta numerica<input ${disabled} data-field="meta_numerica" type="number" step="any" value="${textValue(row.meta_numerica)}"></label>
-                        <label>Valor actual<input ${disabled} data-field="valor_actual" type="number" step="any" value="${textValue(row.valor_actual)}"></label>
+                        <label>Avance numerico<input ${disabled} data-field="valor_actual" type="number" step="any" value="${textValue(row.valor_actual)}"></label>
                         <label>Estado fuente
                             <select ${disabled} data-field="estado_fuente">
                                 <option value="completo" ${row.estado_fuente === 'completo' ? 'selected' : ''}>completo</option>
@@ -236,7 +245,7 @@ registerModule('melProyecto', async (container) => {
                         <label class="span-2">Notas<textarea ${disabled} data-field="notas">${textValue(row.notas)}</textarea></label>
                     </div>
                     <div class="mel-proyecto-slider-panel">
-                        <label>Avance</label>
+                        <label>Porcentaje de avance</label>
                         <div class="kpi-slider-row">
                             <input id="mel-proyecto-progress" ${disabled} class="kpi-slider" data-field="porcentaje_avance" type="range" min="0" max="100" step="1" value="${sliderValue}">
                             <span id="mel-proyecto-progress-value" class="slider-val">${sliderValue}%</span>
