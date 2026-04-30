@@ -136,6 +136,12 @@ body {
   border-left-color: var(--primary);
   font-weight: 600;
 }
+.nav-link[data-module="comparador"],
+.nav-link[data-module="aprendizaje"],
+.nav-link[data-module="inclusion"],
+.nav-link[data-module="territorio"] {
+  display: none;
+}
 .nav-icon {
   font-size: 1.05rem;
   width: 1.6rem;
@@ -821,11 +827,61 @@ body {
 }
 
 /* ===== Evidence Grid ===== */
-.evidence-filters {
+.evidence-entry-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
+}
+.evidence-entry-card {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-bottom: 1rem;
+  min-height: 86px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.15rem;
+  color: var(--text);
+  text-decoration: none;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+}
+.evidence-entry-card:nth-child(2) {
+  border-left-color: var(--accent);
+}
+.evidence-entry-card:nth-child(3) {
+  border-left-color: var(--cyan);
+}
+.evidence-entry-card:nth-child(4) {
+  border-left-color: var(--success);
+}
+.evidence-entry-card:hover,
+.evidence-entry-card:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(79, 107, 246, 0.28);
+  outline: none;
+}
+.evidence-entry-title {
+  font-family: var(--font-title);
+  font-size: 1.35rem;
+  font-weight: 500;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+.evidence-entry-action {
+  align-self: flex-start;
+  padding: 0.35rem 0.7rem;
+  color: var(--primary-dark);
+  background: var(--primary-bg);
+  border-radius: var(--radius-xs);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 .evidence-grid {
   display: grid;

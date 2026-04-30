@@ -5,6 +5,7 @@ const modules = {};
 const state = {
     currentModule: 'inicio',
 };
+const hiddenPresentationModules = new Set(['comparador', 'aprendizaje', 'inclusion', 'territorio']);
 
 /** Registrar un módulo */
 function registerModule(name, renderFn) {
@@ -22,6 +23,11 @@ function navigate(hash) {
         melproyecto: 'melProyecto',
     };
     const requestedModule = hash.replace('#', '') || 'inicio';
+    if (hiddenPresentationModules.has(requestedModule)) {
+        window.location.hash = '#inicio';
+        return;
+    }
+
     const module = routeAliases[requestedModule] || requestedModule;
     state.currentModule = module;
 

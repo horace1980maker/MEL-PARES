@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
-### Requirement: Removed dashboard sections are not available
-The system SHALL remove Comparador, Aprendizaje, and Inclusion from the active dashboard surface.
+### Requirement: Removed dashboard sections are inactive and not advertised
+The system SHALL keep Comparador, Aprendizaje, and Inclusion inactive and SHALL NOT present them as available dashboard sections.
 
 #### Scenario: Navigation is rendered
 - **WHEN** the application navigation is displayed
@@ -14,6 +14,10 @@ The system SHALL remove Comparador, Aprendizaje, and Inclusion from the active d
 #### Scenario: Removed route is requested
 - **WHEN** a user navigates directly to `#comparador`, `#aprendizaje`, or `#inclusion`
 - **THEN** the app does not render those removed modules as active dashboard sections
+
+#### Scenario: Retired files remain in the repository
+- **WHEN** retired module or CSS files for Comparador, Aprendizaje, or Inclusion still exist in the codebase
+- **THEN** they are not loaded, routed, documented, or presented as active dashboard sections
 
 ### Requirement: Documentation reflects removed sections
 The system SHALL stop documenting Comparador, Aprendizaje, and Inclusion as active dashboard sections.

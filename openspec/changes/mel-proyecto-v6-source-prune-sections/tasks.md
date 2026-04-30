@@ -13,12 +13,12 @@
 - [ ] 2.3 Keep MEL Proyecto admin login and protected updates working after the source-field changes.
 - [ ] 2.4 Update `frontend/js/api.js` only if endpoint contracts or export behavior require frontend helper changes.
 
-## 3. Remove Dashboard Sections
+## 3. Removed Dashboard Sections Cleanup
 
 - [ ] 3.1 Remove Comparador, Aprendizaje, and Inclusion from `frontend/index.html` navigation.
-- [ ] 3.2 Stop loading Comparador, Aprendizaje, and Inclusion module scripts in `frontend/index.html`.
-- [ ] 3.3 Remove Comparador, Aprendizaje, and Inclusion route title mappings from `frontend/js/app.js`.
-- [ ] 3.4 Delete or clearly retire `frontend/modules/comparador.js`, `frontend/modules/aprendizaje.js`, and `frontend/modules/inclusion.js` if they are no longer loaded.
+- [x] 3.2 Confirm Comparador, Aprendizaje, and Inclusion module scripts are not loaded in `frontend/index.html`.
+- [x] 3.3 Confirm direct `#comparador`, `#aprendizaje`, and `#inclusion` hashes are redirected away from removed modules in `frontend/js/app.js`.
+- [ ] 3.4 Delete or clearly retire `frontend/modules/comparador.js`, `frontend/modules/aprendizaje.js`, and `frontend/modules/inclusion.js` if they are no longer loaded or documented.
 - [ ] 3.5 Remove or update CSS that only supports the removed Comparador, Aprendizaje, and Inclusion sections when it is no longer referenced.
 
 ## 4. Documentation and Specs
