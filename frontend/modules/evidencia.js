@@ -14,7 +14,7 @@ registerModule('evidencia', (container) => {
         <h2 class="section-title">Repositorio de Evidencia</h2>
         <div class="evidence-entry-grid" aria-label="Accesos destacados de evidencia">
             ${evidenceEntryLinks.map(link => `
-                <a class="evidence-entry-card" href="${link.href}">
+                <a class="evidence-entry-card" href="${link.href}" target="_blank" rel="noopener noreferrer">
                     <span class="evidence-entry-title">${link.title}</span>
                     <span class="evidence-entry-action">Abrir</span>
                 </a>
